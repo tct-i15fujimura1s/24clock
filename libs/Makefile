@@ -1,0 +1,47 @@
+CC = gccc
+
+SRCS1=wait.s lcd.c util.c lcd_util.c matrix.c key.c timer.c ir.c speaker.c
+OBJS1=wait.o lcd.o util.o lcd_util.o matrix.o key.o timer.o ir.o speaker.o
+
+SRCS2=serial.c ADconv.c eeprom.c watchdog.c led.c
+OBJS2=serial.o ADconv.o eeprom.o watchdog.o led.o
+
+SRCS=$(SRCS1) $(SRCS2)
+OBJS=$(OBJS1) $(OBJS2)
+
+CFLAGS= -O2 -Wall -mh -mn 
+
+all:crt0.o libutil.a
+
+libutil.a:$(OBJS)
+	h8300-elf-ar r libutil.a $(OBJS)
+	h8300-elf-ranlib libutil.a
+.c.o:
+	h8300-elf-gcc $(CFLAGS) -c $<
+.s.o:
+	h8300-elf-gcc $(CFLAGS) -c $<
+
+depend:$(SRCS)
+	($(LANGSET) h8300-elf-gcc -M $(CFLAGS) $(SRCS) > depend)
+
+clean:
+	rm -f *~ *.o lib*.a depend
+
+#手動で，以下にdependファイルを挿入した
+#クロスコンパイルでなければ，makedependコマンドが
+#bsd makeかgnu makeかが分かっていれば，.includeかincludeが
+#使えるのだけどなぁ
+
+lcd.o: lcd.c 3664.h wait.h libsCore.h
+util.o: util.c 3664.h libsCore.h matrix.h lcd.h
+lcd_util.o: lcd_util.c lcd_util.h lcd.h
+matrix.o: matrix.c matrix.h libsCore.h 3664.h
+key.o: key.c key.h libsCore.h 3664.h lcd_util.h
+timer.o: timer.c timer.h libsCore.h 3664.h
+ir.o: ir.c ir.h libsCore.h 3664.h
+speaker.o: speaker.c speaker.h libsCore.h 3664.h
+serial.o: serial.c serial.h libsCore.h 3664.h
+ADconv.o: ADconv.c ADconv.h libsCore.h 3664.h
+eeprom.o: eeprom.c eeprom.h libsCore.h 3664.h
+watchdog.o: watchdog.c watchdog.h libsCore.h 3664.h
+led.o: led.c led.h libsCore.h 3664.h
