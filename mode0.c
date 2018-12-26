@@ -1,3 +1,7 @@
+#include "libs.h"
+#include "main.h"
+#include "mode0.h"
+
 volatile int sec1=0;
 volatile int sec10=5;
 volatile int min1=9;
@@ -17,7 +21,7 @@ void do_mode0(UI_DATA* ud){
 
   if(ud->prev_mode!=ud->mode){  /* 他のモードからモード0に遷移した時に実行 */
     /*必要なら，何らかのモードの初期化処理*/
-    lcd_putstr(0,0,"MODE0->MODE0"); /*モード0の初期表示*/
+    lcd_putstr(0,0,"CLOCK24"); /*モード0の初期表示*/
     next_mode_data=MODE_0;
     prev_next_mode_data=MODE_0;
     matrix_scroll=FALSE;
@@ -76,8 +80,7 @@ void do_mode0(UI_DATA* ud){
 
   if(sec_flag==TRUE){ /* 1秒ごとの処理*/
     lcd_clear(); /* LCDをクリア */
-    lcd_putstr(0,0,"MODE0->MODE");
-    lcd_putstr(11,0,str);
+    lcd_putstr(0,0,"CLOCK24");
 
     
 	      sec1++;
@@ -127,7 +130,7 @@ void do_mode0(UI_DATA* ud){
 }
 
 /* モード1: 24時間時計の時刻設定 */
-void do_mode1(UI_DATA *ui_data) {
+void do_mode1(UI_DATA *ud) {
   
   static int matrix_scroll=FALSE;
   static int next_mode_data=MODE_0;

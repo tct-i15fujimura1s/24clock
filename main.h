@@ -1,5 +1,7 @@
-#ifndef MODES
-#define MODES
+#ifndef MAIN_H
+#define MAIN_H
+extern volatile int sec_flag;
+extern volatile int sec;
 
 
 extern volatile int sec_flag;
@@ -10,7 +12,10 @@ enum MENU_MODE{
   MODE_OUT_OF_MIN=-1,
   MODE_0,
   MODE_1,
-  MODE_2,
+  MODE_10,
+  MODE_20,
+  MODE_30,
+  MODE_40,
   MODE_OUT_OF_MAX
 };
 

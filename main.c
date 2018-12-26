@@ -1,4 +1,5 @@
 #include "libs.h"       /* 前のmy3664hの内容は，libs/libs.hへ統合した */
+#include "main.h"
 
 volatile int tma_flag=FALSE;
 volatile int sec_flag=FALSE;
@@ -138,8 +139,7 @@ void timer_init(void){
 
 /* User Interface のステートマシン (ここを作り込む)*/
 
-#include "modes.h"
-extern void do_mode0(UI_DATA *ui_data);
+#include "mode0.h"
 extern void do_mode10(UI_DATA* ui_data);
 extern void do_mode20(UI_DATA* ui_data);
 
@@ -157,9 +157,9 @@ UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良く考えて */
   case MODE_1:
     do_mode1(&ui_data);
     break;
-  case mode10:
+  case MODE_10:
     do_mode10(&ui_data);
-  case MODE_2:
+  case MODE_20:
     do_mode20(&ui_data);
     break;
   default:
@@ -171,7 +171,6 @@ UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良く考えて */
   return &ui_data;
 }
 
-#include "mode0.c"
 
 
 /*時計表示のアルゴリズムの一部*/
