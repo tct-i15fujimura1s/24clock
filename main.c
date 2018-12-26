@@ -197,7 +197,9 @@ void show_sec(void){
 }
 
 #include "mode10.c"
-
+#include "mode20.c"
+#include "mode30.c"
+#include "mode40.c"
 
 int main(void){
          UI_DATA* ui_data=NULL;
