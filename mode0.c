@@ -75,8 +75,7 @@ void do_mode0(UI_DATA* ud){
   }
 
   if(sec_flag==TRUE){ /* 1秒ごとの処理*/
-    lcd_clear();
-    //lcd_putdec(0,1,5,sec);      /* LCDの下の行(1行目)に，経過秒数を表示 */
+    lcd_clear(); /* LCDをクリア */
     lcd_putstr(0,0,"MODE0->MODE");
     lcd_putstr(11,0,str);
 
@@ -122,14 +121,6 @@ void do_mode0(UI_DATA* ud){
     /*いくら工夫しても，防ぎようが無いノイズがあったりするのです…。    */
     /*不具合の発生確率は，「コストをある程度かければ」下げることが可能。*/
 
-    /*ついでに，matrix_ledのスクロールも行ってみる*/
-    if(matrix_scroll!=FALSE){ 
-      /*FALSEでチェックしているのは，0でのチェックの方が一般に高速だから*/
-      /*なお，下記の関数は，単なるデバッグアウトなので，実行をし続けたら*/
-      /*フォントテーブルを抜け出してしまい，表示が変になります。*/
-      matrix_font_debug_out_sample(matrix_led_pattern);
-    }
-
     sec_flag=FALSE;
   }
 
@@ -146,10 +137,12 @@ void do_mode1(UI_DATA *ui_data) {
   /*モード0で必ず実行するコードを記述*/
   prev_next_mode_data=next_mode_data;
 
+
+  
   
   if(ud->prev_mode!=ud->mode){  /* 他のモードからモード0に遷移した時に実行 */
     /*必要なら，何らかのモードの初期化処理*/
-    lcd_putstr(0,0,"MODE0->MODE0"); /*モード0の初期表示*/
+    lcd_putstr(0,0,"MODE0->MODE1"); /*モード1の初期表示*/
     next_mode_data=MODE_0;
     prev_next_mode_data=MODE_0;
     matrix_scroll=FALSE;
