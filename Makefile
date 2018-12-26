@@ -7,7 +7,7 @@ main.mot: main
 main:main.c subdirs
 	h8300-elf-gcc -O2 -Wall -nostdlib -mh -mn \
          -Xlinker -T h8-3664.x -L./libs -I./libs \
-	-o main main.c  ./libs/crt0.o -lutil -lc -lgcc 
+	-o main main.c  ./libs/crt0.o -lutil -lc -lgcc
 
 subdirs:
 	(cd libs;make all)

@@ -15,6 +15,6 @@ extern void lcd_blink(int);           /* LCDのカーソルブリンク（点滅）ON/OFF*/
 
 extern void lcd_putstr(int, int, char *);     /* LCDの指定された座標へ文字を*/
 					      /*出力します。 */
-
+extern void lcd_putchr(int, int, char);
 
 #endif

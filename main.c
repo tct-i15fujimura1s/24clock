@@ -8,12 +8,15 @@ volatile int sec=0;
 volatile int tempo_flag=FALSE;
 int tempo_compare=0;
 
-#define DEBUG          /* デバッグ中は，定義しておく */
+
+
 
 static unsigned int matrix_led_pattern[8]=
   //{0x007e,0x0011,0x0011,0x0011,0x007e,0x7f00,0x4900,0x4900};
 {0x7e7e,0x1111,0x1111,0x0011,0x007e,0x7f00,0x4900,0x4900};
 /*列0〜7のデータ(詳細は，過去のリストを読め)*/
+
+#define DEBUG          /* デバッグ中は，定義しておく */
 
 /* int_timera() や int_imterv() の割込ルーチン(ボトムハーフの処理) */
 
@@ -27,7 +30,9 @@ void int_timera(void){
 	if(++count >= 32){
 	      count=0;
 	      sec_flag = TRUE;
-	      sec++;               /* secは，1秒ごとにインクリメントされる*/
+	      /* 1秒増やす */
+	      sec++;
+	      
 	}
 
 #ifdef DEBUG
@@ -133,41 +138,10 @@ void timer_init(void){
 
 /* User Interface のステートマシン (ここを作り込む)*/
 
-/* 適切なモード名を入れることが望ましいが，MODE_0〜とする。 */
-/* 美しい書き方をするならば，適切なテーブルを持つ必要がある */
-enum MENU_MODE{
-  MODE_OUT_OF_MIN=-1,
-  MODE_0,
-  MODE_1,
-  MODE_2,
-  MODE_OUT_OF_MAX
-};
-
-//うぅ。下記のKとkの見分け(大文字小文字の見分け)が付かずに，
-//１時間半の痛恨のロス(2011/12/19 00:37 by T.NITTA)
-enum SW_CODE{
-  KEY_NONE=0,         //キー入力無し 
-  KEY_SHORT_U=(1<<4), //上短押し
-  KEY_SHORT_D=(1<<3), //下短押し
-  KEY_SHORT_L=(1<<2), //左短押し
-  KEY_SHORT_R=(1<<1), //右短押し
-  KEY_SHORT_C=(1<<0), //中央短押し
-  KEY_LONG_U=(0x80 | (1<<4)), //上長押し
-  KEY_LONG_D=(0x80 | (1<<3)), //下長押し
-  KEY_LONG_L=(0x80 | (1<<2)), //左長押し
-  KEY_LONG_R=(0x80 | (1<<1)), //右長押し
-  KEY_LONG_C=(0x80 | (1<<0))  //中央長押し
-};
-
-typedef struct _UI_DATA{
-  int mode;
-  int prev_mode;
-  unsigned char sw;
-}UI_DATA;
-
-extern void do_mode0(UI_DATA* ui_data);
-extern void do_mode1(UI_DATA* ui_data);
-extern void do_mode2(UI_DATA* ui_data);
+#include "modes.h"
+extern void do_mode0(UI_DATA *ui_data);
+extern void do_mode10(UI_DATA* ui_data);
+extern void do_mode20(UI_DATA* ui_data);
 
 UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良く考えて */
   static UI_DATA ui_data={MODE_0,MODE_0,};
@@ -183,8 +157,10 @@ UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良く考えて */
   case MODE_1:
     do_mode1(&ui_data);
     break;
+  case mode10:
+    do_mode10(&ui_data);
   case MODE_2:
-    do_mode2(&ui_data);
+    do_mode20(&ui_data);
     break;
   default:
     break;
@@ -195,145 +171,7 @@ UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良く考えて */
   return &ui_data;
 }
 
-void do_mode0(UI_DATA* ud){
-  static int matrix_scroll=FALSE;
-  static int next_mode_data=MODE_0;
-  int prev_next_mode_data;
-  static char str[2];
-
-  /*モード0で必ず実行するコードを記述*/
-  prev_next_mode_data=next_mode_data;
-
-  if(ud->prev_mode!=ud->mode){  /* 他のモードからモード0に遷移した時に実行 */
-    /*必要なら，何らかのモードの初期化処理*/
-    lcd_putstr(0,0,"MODE0->MODE0"); /*モード0の初期表示*/
-    next_mode_data=MODE_0;
-    prev_next_mode_data=MODE_0;
-    matrix_scroll=FALSE;
-  }
-
-  switch(ud->sw){  /*モード内でのキー入力別操作*/
-
-  case KEY_SHORT_U: /* 上短押し */
-    if(next_mode_data  < (MODE_OUT_OF_MAX-1)){
-      next_mode_data++;
-    }
-    break;
-
-  case KEY_SHORT_D: /* 下短押し */
-    if(next_mode_data  > (MODE_OUT_OF_MIN+1)){
-      next_mode_data--;
-    }
-    break;
-
-  case KEY_SHORT_L: /* 左短押し */
-    FLIP_LED_RED(); //赤色LEDのフリップを実行
-    break;
-
-  case KEY_SHORT_R: /* 右短押し */
-    FLIP_LED_GREEN();
-    break;
-
-  case KEY_LONG_L: /* 左長押し */
-    FLIP_LED_BLUE();
-    break;
-
-  case KEY_LONG_R: /* 右長押し */
-    if(matrix_scroll==FALSE){//マトリクスLEDのスクロールフラグのフリップ
-      matrix_scroll=TRUE;
-    }else{
-      matrix_scroll=FALSE;
-    }
-
-    break;
-
-  case KEY_LONG_C: /* 中央キーの長押し */
-    ud->mode=next_mode_data;/*次は，モード変更*/
-    break;
-
-  default: /*上記以外*/
-    break;
-  }
-
-  /* モードの終了時に処理するコード */
-  if((prev_next_mode_data!=next_mode_data) || sec_flag==TRUE){ 
-    /* 次の希望するモードの値が変わった時の処理 */
-    str[0]='0'+next_mode_data;
-    str[1]='\0';
-    lcd_putstr(11,0,str);
-  }
-
-  if(sec_flag==TRUE){ /* 1秒ごとの処理*/
-    lcd_clear();
-    lcd_putdec(0,1,5,sec);      /* LCDの下の行(1行目)に，経過秒数を表示 */
-    lcd_putstr(0,0,"MODE0->MODE");
-    lcd_putstr(11,0,str);
-
-    /*コメント：ここでは，LCDの再描画処理を1秒ごとに行っている。        */
-    /*これは，万が一，予期せぬノイズで，LCDの表示に誤動作が発生しても， */
-    /*1秒後には，回復させるという効果を期待している。ハードの世界では， */
-    /*いくら工夫しても，防ぎようが無いノイズがあったりするのです…。    */
-    /*不具合の発生確率は，「コストをある程度かければ」下げることが可能。*/
-
-    /*ついでに，matrix_ledのスクロールも行ってみる*/
-    if(matrix_scroll!=FALSE){ 
-      /*FALSEでチェックしているのは，0でのチェックの方が一般に高速だから*/
-      /*なお，下記の関数は，単なるデバッグアウトなので，実行をし続けたら*/
-      /*フォントテーブルを抜け出してしまい，表示が変になります。*/
-      matrix_font_debug_out_sample(matrix_led_pattern);
-    }
-
-    sec_flag=FALSE;
-  }
-
-}
-
-void do_mode1(UI_DATA* ud){
-  static int tempo=120;
-
-  if(ud->prev_mode!=ud->mode){  /* 他のモード遷移した時に実行 */
-    /*必要なら，何らかのモードの初期化処理*/
-    lcd_clear();
-    lcd_putstr(0,0,"MODE1"); /*モード1の初期表示*/
-    lcd_putstr(0,1,"TEMPO=120"); /*モード1の初期表示*/
-    tempo=120;
-    tempo_compare = 3735 / tempo; /* 1000/(tempo * 16 / 60) を展開 */
-  }
-
-  /*モード1は，真中ボタンが押されたら，MODE0に戻るだけの単純な処理*/
-  /*それに，beta2のバージョンでは，音楽再生機能の起動部分を追加*/
-  /*但し，main関数内で，キーのデバッグ表示を行っている*/
-  switch(ud->sw){  /*モード内でのキー入力別操作*/
-  case KEY_LONG_C:  /* 中央キーの長押し */
-    ud->mode=MODE_0; /* 次は，モード0に戻る */
-    break;
-
-  case KEY_SHORT_L: /* 左のキーが押されたら,演奏開始*/
-    snd_play("CDEFEDC EFG^A_GFE C C C C !C!C!D!D!E!E!F!FEDC");
-    break;
-
-  case KEY_SHORT_R: /* 右のキーが押されたら,演奏終了*/
-    snd_stop();
-    break;
-
-  case KEY_SHORT_U: /* テンポUP */
-    tempo+=10;
-    if(tempo>=240)
-      tempo=240;
-    tempo_compare = 3735 / tempo;
-    lcd_putdec(6,1,3,tempo);
-    break;
-
-  case KEY_SHORT_D: /* テンポDOWN */
-    tempo-=10;
-    if(tempo<=60)
-      tempo=60;
-    tempo_compare = 3735 / tempo;
-    lcd_putdec(6,1,3,tempo);
-    break;
-  }
-
-}
+#include "mode0.c"
 
 
 /*時計表示のアルゴリズムの一部*/
@@ -358,7 +196,10 @@ void show_sec(void){
   lcd_putstr(16-5,1,data);
 }
 
-void do_mode2(UI_DATA* ud){
+#include "mode10.c"
+
+
+void do_mode20(UI_DATA* ud){
 
   if(ud->prev_mode!=ud->mode || sec_flag==TRUE){ 
     /* 他のモード遷移した時に実行 もしくは，1秒ごとに表示*/

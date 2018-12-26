@@ -156,3 +156,9 @@ void lcd_putstr(int x, int y, char *s) {
 	}
 }
 
+void lcd_putchr(int x, int y, char c) {
+  char s[2];
+  s[0] = c;
+  s[1] = '\0';
+  lcd_putstr(x, y, s);
+}
