@@ -157,9 +157,9 @@ UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良�
   case MODE_1:
     do_mode1(&ui_data);
     break;
-  case mode10:
+  case MODE_10:
     do_mode10(&ui_data);
-  case MODE_2:
+  case MODE_20:
     do_mode20(&ui_data);
     break;
   default:
