@@ -1,4 +1,4 @@
-#include "libs.h"       /* ����my3664h�����Ƥϡ�libs/libs.h�����礷�� */
+#include "libs.h"       /* 前のmy3664hの内容は，libs/libs.hへ統合した */
 #include "main.h"
 
 volatile int tma_flag=FALSE;
@@ -157,9 +157,9 @@ UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良�
   case MODE_1:
     do_mode1(&ui_data);
     break;
-  case MODE_10:
+  case mode10:
     do_mode10(&ui_data);
-  case MODE_20:
+  case MODE_2:
     do_mode20(&ui_data);
     break;
   default:
@@ -287,4 +287,3 @@ int main(void){
  (3) 同様の指示で省略
  (4)～(9) 初回と同様。
  ************************************************************/
-
