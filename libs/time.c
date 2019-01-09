@@ -15,7 +15,7 @@ void time_add_seconds(TIME *time, int sec) {
 }
 
 void time_add_minutes(TIME *time, int min) {
-  min += time->seconds;
+  min += time->minutes;
   if(min < 0) {
     time_add_hours(time, min / 60);
     min += 60;
@@ -31,13 +31,14 @@ void time_add_hours(TIME *time, int h) {
   time->hours = (time->hours + h) % 24;
 }
 
-char temp[9] = "00:00:00";
-const char *time_to_string(TIME *time) {
+void time_to_string(TIME *time, char *temp) {
   temp[0] = '0' + (time->seconds % 10);
   temp[1] = '0' + (time->seconds / 10);
+  temp[2] = ':';
   temp[3] = '0' + (time->minutes % 10);
   temp[4] = '0' + (time->minutes / 10);
+  temp[5] = ':';
   temp[6] = '0' + (time->hours % 10);
   temp[7] = '0' + (time->hours / 10);
-  return temp;
+  temp[8] = '\0';
 }

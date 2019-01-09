@@ -11,12 +11,13 @@ extern int tempo_compare;
 /* 美しい書き方をするならば，適切なテーブルを持つ必要がある */
 enum MENU_MODE{
   MODE_OUT_OF_MIN=-1,
-  MODE_0,
+  MODE_0 = 0,
   MODE_1,
-  MODE_10,
-  MODE_20,
-  MODE_30,
-  MODE_40,
+  MODE_2,
+  MODE_10 = 10,
+  MODE_20 = 20,
+  MODE_30 = 30,
+  MODE_40 = 40,
   MODE_OUT_OF_MAX
 };
 
@@ -42,5 +43,6 @@ typedef struct _UI_DATA{
   unsigned char sw;
 }UI_DATA;
 
+extern void mode_go(UI_DATA *ud, int mode);
 
 #endif

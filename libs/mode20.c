@@ -9,7 +9,7 @@ void do_mode20(UI_DATA* ud){
     /* 他のモード遷移した時に実行 もしくは，1秒ごとに表示*/
     /*必要なら，何らかのモードの初期化処理*/
     lcd_clear();  //0123456789ABCDEF
-    lcd_putstr(0,0,"MODE2:secｦ ﾋｮｳｼﾞ"); /*モード2の初期表示*/
+    lcd_putstr(0,0,"MODE2:show sec"); /*モード2の初期表示*/
     show_sec();
     sec_flag=FALSE;
   }

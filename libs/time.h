@@ -10,6 +10,6 @@ typedef struct {
 extern void time_add_seconds(TIME *, int);
 extern void time_add_minutes(TIME *, int);
 extern void time_add_hours(TIME *, int);
-extern const char *time_to_string(TIME *);
+extern void time_to_string(TIME *, char *);
 
 #endif

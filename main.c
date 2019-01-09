@@ -136,6 +136,11 @@ void timer_init(void){
 
 /* User Interface のステートマシン (ここを作り込む)*/
 
+void mode_go(UI_DATA *ud, int mode) {
+  ud->prev_mode = mode;
+  ud->mode = mode;
+}
+
 #include "mode0.h"
 #include "mode10.h"
 #include "mode20.h"
@@ -153,6 +158,9 @@ UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良�
     break;
   case MODE_1:
     do_mode1(&ui_data);
+    break;
+  case MODE_2:
+    do_mode2(&ui_data);
     break;
   case MODE_10:
     do_mode10(&ui_data);
@@ -226,11 +234,6 @@ int main(void){
 	  if(tma_flag == TRUE){ 
 	    sw = sw_mng();       /* スイッチの入力チェック libs/key.c */
 	    ui_data=ui(sw);           /* ユーザインタフェースの実行 */
-
-	    if(ui_data->mode==MODE_1){
-	      /* MODE1だったら，キー入力のデバッグアウトのデバッグ出力 */
-	      key_debug_out_sample(); 
-	    }
 
 	    tma_flag=FALSE;
 	  }

@@ -40,7 +40,7 @@ void lcd_putudec(int x, int y, int l, unsigned int v) {
   }
 
   for (; i>=0; i--) {
-    buf[i] = ' ';
+    buf[i] = '0';
   }
   buf[l] = '\0';
   lcd_putstr(x, y, buf);
