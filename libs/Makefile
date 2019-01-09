@@ -6,8 +6,8 @@ OBJS1=wait.o lcd.o util.o lcd_util.o matrix.o key.o timer.o ir.o speaker.o
 SRCS2=serial.c ADconv.c eeprom.c watchdog.c led.c
 OBJS2=serial.o ADconv.o eeprom.o watchdog.o led.o
 
-SRCS3=time.c
-OBJS3=time.o
+SRCS3=time.c mode0.c mode10.c mode20.c mode30.c mode40.c
+OBJS3=time.o mode0.o mode10.o mode20.o mode30.o mode40.o
 
 SRCS=$(SRCS1) $(SRCS2) $(SRCS3)
 OBJS=$(OBJS1) $(OBJS2) $(OBJS3)
@@ -49,3 +49,8 @@ eeprom.o: eeprom.c eeprom.h libsCore.h 3664.h
 watchdog.o: watchdog.c watchdog.h libsCore.h 3664.h
 led.o: led.c led.h libsCore.h 3664.h
 time.o: time.c time.h
+mode0.o: mode0.c mode0.h
+mode10.o: mode10.c mode10.h
+mode20.o: mode20.c mode20.h
+mode30.o: mode30.c
+mode40.o: mode40.c
