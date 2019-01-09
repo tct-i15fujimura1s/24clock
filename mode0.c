@@ -2,19 +2,12 @@
 #include "main.h"
 #include "mode0.h"
 
-volatile int sec1=0;
-volatile int sec10=5;
-volatile int min1=9;
-volatile int min10=5;
-volatile int hour1=3;
-volatile int hour10=2;
-
+TIME time = {0, 0, 0};
 
 void do_mode0(UI_DATA* ud){
   static int matrix_scroll=FALSE;
   static int next_mode_data=MODE_0;
   int prev_next_mode_data;
-  static char str[2];
 
   /*モード0で必ず実行するコードを記述*/
   prev_next_mode_data=next_mode_data;
@@ -70,53 +63,14 @@ void do_mode0(UI_DATA* ud){
     break;
   }
 
-  /* モードの終了時に処理するコード */
-  if((prev_next_mode_data!=next_mode_data) || sec_flag==TRUE){ 
-    /* 次の希望するモードの値が変わった時の処理 */
-    str[0]='0'+next_mode_data;
-    str[1]='\0';
-    lcd_putstr(11,0,str);
-  }
-
   if(sec_flag==TRUE){ /* 1秒ごとの処理*/
     lcd_clear(); /* LCDをクリア */
     lcd_putstr(0,0,"CLOCK24");
 
-    
-	      sec1++;
-	      if(sec1 == 10) {
-		sec10++;
-		sec1 = 0;
-	      }
-	      if(sec10 == 6) {
-		min1++;
-		sec10 = 0;
-	      }
-	      if(min1 == 10) {
-		min10++;
-		min1 = 0;
-	      }
-	      if(min10 == 6) {
-		hour1++;
-		min10 = 0;
-	      }
-	      if(hour1 == 10) {
-		hour10++;
-		hour1 = 0;
-	      }
-	      if(hour10 == 2 && hour1 == 4) {
-		hour1 = 0;
-		hour10 = 0;
-	      }
+    time_add_seconds(&time, 1);
 
     /* 24時間時計 */
-    lcd_putchr(0, 1, '0' + hour10);
-    lcd_putchr(1, 1, '0' + hour1);
-    lcd_putstr(2, 1, ":  :");
-    lcd_putchr(3, 1, '0' + min10);
-    lcd_putchr(4, 1, '0' + min1);
-    lcd_putchr(6, 1, '0' + sec10);
-    lcd_putchr(7, 1, '0' + sec1);
+    lcd_putchr(0, 1, time_to_string(&time));
 
     /*コメント：ここでは，LCDの再描画処理を1秒ごとに行っている。        */
     /*これは，万が一，予期せぬノイズで，LCDの表示に誤動作が発生しても， */
@@ -135,7 +89,6 @@ void do_mode1(UI_DATA *ud) {
   static int matrix_scroll=FALSE;
   static int next_mode_data=MODE_0;
   int prev_next_mode_data;
-  static char str[2];
 
   /*モード0で必ず実行するコードを記述*/
   prev_next_mode_data=next_mode_data;

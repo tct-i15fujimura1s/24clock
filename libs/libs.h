@@ -16,6 +16,7 @@
 #include "eeprom.h"
 #include "watchdog.h"
 #include "led.h"
+#include "time.h"
 
 /* ここに書いていた宣言などは，           */
 /* ソースリストの依存関係を軽減するために */

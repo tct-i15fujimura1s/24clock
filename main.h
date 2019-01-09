@@ -2,9 +2,10 @@
 #define MAIN_H
 extern volatile int sec_flag;
 extern volatile int sec;
-
-
 extern volatile int sec_flag;
+
+extern volatile int tempo_flag;
+extern int tempo_compare;
 
 /* 適切なモード名を入れることが望ましいが，MODE_0〜とする。 */
 /* 美しい書き方をするならば，適切なテーブルを持つ必要がある */

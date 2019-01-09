@@ -1,3 +1,8 @@
+#include "libs.h"
+#include "main.h"
+#include "mode20.h"
+
+
 void do_mode20(UI_DATA* ud){
 
   if(ud->prev_mode!=ud->mode || sec_flag==TRUE){ 

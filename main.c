@@ -9,9 +9,6 @@ volatile int sec=0;
 volatile int tempo_flag=FALSE;
 int tempo_compare=0;
 
-
-
-
 static unsigned int matrix_led_pattern[8]=
   //{0x007e,0x0011,0x0011,0x0011,0x007e,0x7f00,0x4900,0x4900};
 {0x7e7e,0x1111,0x1111,0x0011,0x007e,0x7f00,0x4900,0x4900};
@@ -140,8 +137,8 @@ void timer_init(void){
 /* User Interface のステートマシン (ここを作り込む)*/
 
 #include "mode0.h"
-extern void do_mode10(UI_DATA* ui_data);
-extern void do_mode20(UI_DATA* ui_data);
+#include "mode10.h"
+#include "mode20.h"
 
 UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良く考えて */
   static UI_DATA ui_data={MODE_0,MODE_0,};
@@ -171,8 +168,6 @@ UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良�
   return &ui_data;
 }
 
-
-
 /*時計表示のアルゴリズムの一部*/
 void show_sec(void){
   char data[6];
@@ -194,11 +189,6 @@ void show_sec(void){
 
   lcd_putstr(16-5,1,data);
 }
-
-#include "mode10.c"
-#include "mode20.c"
-#include "mode30.c"
-#include "mode40.c"
 
 int main(void){
          UI_DATA* ui_data=NULL;

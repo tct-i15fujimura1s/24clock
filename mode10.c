@@ -1,3 +1,7 @@
+#include "libs.h"
+#include "main.h"
+#include "mode10.h"
+
 void do_mode10(UI_DATA* ud){
   static int tempo=120;
 

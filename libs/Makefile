@@ -6,8 +6,11 @@ OBJS1=wait.o lcd.o util.o lcd_util.o matrix.o key.o timer.o ir.o speaker.o
 SRCS2=serial.c ADconv.c eeprom.c watchdog.c led.c
 OBJS2=serial.o ADconv.o eeprom.o watchdog.o led.o
 
-SRCS=$(SRCS1) $(SRCS2)
-OBJS=$(OBJS1) $(OBJS2)
+SRCS3=time.c
+OBJS3=time.o
+
+SRCS=$(SRCS1) $(SRCS2) $(SRCS3)
+OBJS=$(OBJS1) $(OBJS2) $(OBJS3)
 
 CFLAGS= -O2 -Wall -mh -mn 
 
@@ -45,3 +48,4 @@ ADconv.o: ADconv.c ADconv.h libsCore.h 3664.h
 eeprom.o: eeprom.c eeprom.h libsCore.h 3664.h
 watchdog.o: watchdog.c watchdog.h libsCore.h 3664.h
 led.o: led.c led.h libsCore.h 3664.h
+time.o: time.c time.h

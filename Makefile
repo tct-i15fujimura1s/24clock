@@ -1,5 +1,7 @@
 all:main.mot
 
+MODES=mode0.c mode10.c mode20.c
+
 main.mot: main
 	h8300-elf-objcopy -O srec main main.mot
 
@@ -8,7 +10,7 @@ main:main.c subdirs
 	h8300-elf-gcc -O2 -Wall -nostdlib -mh -mn \
          -Xlinker -T h8-3664.x -L./libs -I./libs \
 	-o main main.c  ./libs/crt0.o -lutil -lc -lgcc \
-	mode0.c
+	$(MODES)
 
 subdirs:
 	(cd libs;make all)
