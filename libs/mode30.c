@@ -1,9 +1,9 @@
 #include "libs.h"
 #include "main.h"
-#include "mode20.h"
+#include "mode30.h"
 
 
-void do_mode20(UI_DATA* ud){
+void do_mode30(UI_DATA* ud){
 
   if(ud->prev_mode!=ud->mode || sec_flag==TRUE){ 
     /* 他のモード遷移した時に実行 もしくは，1秒ごとに表示*/
