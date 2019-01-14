@@ -7,41 +7,34 @@ volatile char temp[9];
 
 volatile int cursor_position = 0;
 
-void do_mode0(UI_DATA* ud){
-  static int next_mode_data=MODE_0;
-  int prev_next_mode_data;
+static MENU_MODE mode_add(MENU_MODE mm, int n){
+  mm += n;
+  if(mm < MODE_10) mm += MODE_OUT_OF_MAX / 10 * 10; // MODE10より小さくなりそうならMODEの10刻み最大値を足す
+  else if(mm > MODE_OUT_OF_MAX) mm -= MODE_OUT_OF_MAX / 10 * 10; // MODEの最大値よりはみ出そうならMODEのの10刻み最大値を引く
+  return mm;
+}
 
-  /*モード0で必ず実行するコードを記述*/
-  prev_next_mode_data=next_mode_data;
+void do_mode0(UI_DATA* ud){
+  static int next_mode_data=MODE_10;
 
   if(ud->prev_mode!=ud->mode){  /* 他のモードからモード0に遷移した時に実行 */
     /*必要なら，何らかのモードの初期化処理*/
     lcd_clear();
-    lcd_putstr(0,0,"MODE0->"); /*モード0の初期表示*/
-    next_mode_data=MODE_0;
-    prev_next_mode_data=MODE_0;
+    lcd_putstr(0,0,"-> MODE"); /*モード0の初期表示*/
+    lcd_putstr(0,1,"   MODE");
   }
 
-  lcd_putstr(7,0,"MODE");
-  lcd_putudec(11,0,1,next_mode_data/10);
+  lcd_putudec(7,0,1,next_mode_data/10);
+  lcd_putudec(7,1,1,mode_add(next_mode_data,10)/10);
 
   switch(ud->sw){  /*モード内でのキー入力別操作*/
 
   case KEY_SHORT_U: /* 上短押し */
-    if(next_mode_data  < (MODE_OUT_OF_MAX-1)){
-      next_mode_data += 10;
-    }
+    next_mode_data = mode_add(next_mode_data,10);
     break;
 
   case KEY_SHORT_D: /* 下短押し */
-    if(next_mode_data  > (MODE_OUT_OF_MIN+1)){
-      next_mode_data -= 10;
-    }
-    break;
-
-
-  case KEY_LONG_R:
-    ud->mode=MODE_1;
+    next_mode_data = mode_add(next_mode_data,-10);
     break;
     
   case KEY_LONG_C: /* 中央キーの長押し */
