@@ -25,11 +25,11 @@ void do_mode0(UI_DATA* ud){
   switch(ud->sw){  /*モード内でのキー入力別操作*/
 
   case KEY_SHORT_U: /* 上短押し */
-    next_mode_data = mode_add(next_mode_data,10);
+    next_mode_data = mode_add(next_mode_data,-10);
     break;
 
   case KEY_SHORT_D: /* 下短押し */
-    next_mode_data = mode_add(next_mode_data,-10);
+    next_mode_data = mode_add(next_mode_data,+10);
     break;
     
   case KEY_LONG_C: /* 中央キーの長押し */
