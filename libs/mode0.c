@@ -14,11 +14,11 @@ void do_mode0(UI_DATA* ud){
 
   if(ud->prev_mode!=ud->mode){  /* 他のモードからモード0に遷移した時に実行 */
     /*必要なら，何らかのモードの初期化処理*/
-    lcd_clear();
-    lcd_putstr(0,0,"-> MODE"); /*モード0の初期表示*/
-    lcd_putstr(0,1,"   MODE");
   }
 
+  lcd_clear();
+  lcd_putstr(0,0,"-> MODE"); /*モード0の初期表示*/
+  lcd_putstr(0,1,"   MODE");
   lcd_putudec(7,0,1,next_mode_data/10);
   lcd_putudec(7,1,1,mode_add(next_mode_data,10)/10);
 
