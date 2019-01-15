@@ -1,6 +1,14 @@
+*.revas
+*.objdump
+*.nm
+*.hexdump
+*.lst
 *.o
-*.mot
-*.fast
 *~
 main
+main.s
+main.mot
+main.ps
+main.pdf
+main.log
 \#*\#

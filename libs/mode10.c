@@ -2,49 +2,115 @@
 #include "main.h"
 #include "mode10.h"
 
+TIME time = {0, 0, 0};
+
+volatile int cursor_position = 0;
+
+/* モード1: 24時間時計の時刻設定 */
 void do_mode10(UI_DATA* ud){
-  static int tempo=120;
-
-  if(ud->prev_mode!=ud->mode){  /* 他のモード遷移した時に実行 */
+  if(ud->prev_mode!=ud->mode){  /* 他のモードからモード10に遷移した時に実行 */
     /*必要なら，何らかのモードの初期化処理*/
+    lcd_putstr(0,0,"MODE1:SET24CLOCK"); /*モード10の初期表示*/
+    lcd_putstr(10,1,"-->\xc4\xb9\xb2");
     lcd_clear();
-    lcd_putstr(0,0,"MODE1"); /*モード1の初期表示*/
-    lcd_putstr(0,1,"TEMPO=120"); /*モード1の初期表示*/
-    tempo=120;
-    tempo_compare = 3735 / tempo; /* 1000/(tempo * 16 / 60) を展開 */
+    lcd_cursor(TRUE);
+    lcd_blink(TRUE);
   }
 
-  /*モード1は，真中ボタンが押されたら，MODE0に戻るだけの単純な処理*/
-  /*それに，beta2のバージョンでは，音楽再生機能の起動部分を追加*/
-  /*但し，main関数内で，キーのデバッグ表示を行っている*/
   switch(ud->sw){  /*モード内でのキー入力別操作*/
-  case KEY_LONG_C:  /* 中央キーの長押し */
-    ud->mode=MODE_0; /* 次は，モード0に戻る */
+  case KEY_SHORT_U: /* 上短押し */
+  case KEY_SHORT_D: /* 下短押し */
+  {
+    int delta = (ud->sw == KEY_SHORT_U ? 1 : -1) * (cursor_position & 1 ? 1 : 10);
+    if(cursor_position < 2){
+      time_add_hours(&time, delta);
+    }else if(cursor_position < 4){
+      time_add_minutes(&time, delta);
+    }else{
+      time_add_seconds(&time, delta);
+    }
+  }
+    break;
+  
+  case KEY_SHORT_L: /* 左短押し */
+    cursor_position = (cursor_position + 5) % 6;
     break;
 
-  case KEY_SHORT_L: /* 左のキーが押されたら,演奏開始*/
-    snd_play("CDEFEDC EFG^A_GFE C C C C !C!C!D!D!E!E!F!FEDC");
+  case KEY_SHORT_R: /* 右短押し */
+    cursor_position = (cursor_position + 1) % 6;
     break;
 
-  case KEY_SHORT_R: /* 右のキーが押されたら,演奏終了*/
-    snd_stop();
+  case KEY_LONG_R: /* 右長押し */
+    lcd_cursor(FALSE);
+    lcd_blink(FALSE);
+    ud->mode = MODE_11; /* 時計画面に */
     break;
 
-  case KEY_SHORT_U: /* テンポUP */
-    tempo+=10;
-    if(tempo>=240)
-      tempo=240;
-    tempo_compare = 3735 / tempo;
-    lcd_putdec(6,1,3,tempo);
+  case KEY_LONG_C: /* 中央キーの長押し */
+    lcd_cursor(FALSE);
+    lcd_blink(FALSE);
+    ud->mode=MODE_0; /* メニューに移動 */
     break;
 
-  case KEY_SHORT_D: /* テンポDOWN */
-    tempo-=10;
-    if(tempo<=60)
-      tempo=60;
-    tempo_compare = 3735 / tempo;
-    lcd_putdec(6,1,3,tempo);
+  default: /*上記以外*/
     break;
   }
 
+  if(sec_flag==TRUE){
+    /* 24時間時計 */
+    lcd_putstr(0,1,"  :  :");
+    lcd_putudec(0,1,2,time.hours);
+    lcd_putudec(3,1,2,time.minutes);
+    lcd_putudec(6,1,2,time.seconds);
+
+    /* カーソルの表示 */
+    int value, real_cursor_position;
+    if(cursor_position < 2){
+      value = time.hours;
+      real_cursor_position = cursor_position;
+    }else if(cursor_position < 4){
+      value = time.minutes;
+      real_cursor_position = cursor_position + 1;
+    }else{
+      value = time.seconds;
+      real_cursor_position = cursor_position + 2;
+    }
+    if((cursor_position & 1) == 0){
+      value *= 10;
+    }
+    lcd_putudec(real_cursor_position,1,1,value);
+
+    /*コメント：ここでは，LCDの再描画処理を1秒ごとに行っている。        */
+    /*これは，万が一，予期せぬノイズで，LCDの表示に誤動作が発生しても， */
+    /*1秒後には，回復させるという効果を期待している。ハードの世界では， */
+    /*いくら工夫しても，防ぎようが無いノイズがあったりするのです…。    */
+    /*不具合の発生確率は，「コストをある程度かければ」下げることが可能。*/
+
+    sec_flag=FALSE;
+  }
+
+}
+
+/* モード1: 24時間時計 */
+void do_mode11(UI_DATA *ud) {
+  if(ud->prev_mode != ud->mode){
+    lcd_clear(); /* LCDをクリア */
+    lcd_putstr(0,0,"MODE1:24CLOCK");
+    //lcd_putstr(0,2,"\xbe\xaf\xc3\xb2<--");
+  }
+  
+  // 1秒ごと
+  if(sec_flag==TRUE) { /* 1秒ごとの処理*/
+    
+    time_add_seconds(&time, 1); /* 時刻を一秒増やす */
+
+    /* 24時間時計 */
+    lcd_putstr(0,1,"  :  :");
+    lcd_putudec(0,1,2,time.hours);
+    lcd_putudec(3,1,2,time.minutes);
+    lcd_putudec(6,1,2,time.seconds);
+    
+    sec_flag = FALSE;
+  }
+  
 }

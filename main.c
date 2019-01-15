@@ -1,5 +1,9 @@
 #include "libs.h"       /* 前のmy3664hの内容は，libs/libs.hへ統合した */
 #include "main.h"
+#include "mode0.h"
+#include "mode10.h"
+#include "mode20.h"
+#include "mode30.h"
 
 volatile int tma_flag=FALSE;
 volatile int sec_flag=FALSE;
@@ -8,6 +12,7 @@ volatile int sec=0;
 
 volatile int tempo_flag=FALSE;
 int tempo_compare=0;
+
 
 static unsigned int matrix_led_pattern[8]=
   //{0x007e,0x0011,0x0011,0x0011,0x007e,0x7f00,0x4900,0x4900};
@@ -141,10 +146,6 @@ void mode_go(UI_DATA *ud, int mode) {
   ud->mode = mode;
 }
 
-#include "mode0.h"
-#include "mode10.h"
-#include "mode20.h"
-
 UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良く考えて */
   static UI_DATA ui_data={MODE_0,MODE_0,};
   int prev_mode;
@@ -156,16 +157,16 @@ UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良�
   case MODE_0:
     do_mode0(&ui_data);
     break;
-  case MODE_1:
-    do_mode1(&ui_data);
-    break;
-  case MODE_2:
-    do_mode2(&ui_data);
-    break;
   case MODE_10:
     do_mode10(&ui_data);
+    break;
+  case MODE_11:
+    do_mode11(&ui_data);
+    break;
   case MODE_20:
     do_mode20(&ui_data);
+  case MODE_30:
+    do_mode30(&ui_data);
     break;
   default:
     break;
@@ -174,28 +175,6 @@ UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良�
   ui_data.prev_mode=prev_mode;
 
   return &ui_data;
-}
-
-/*時計表示のアルゴリズムの一部*/
-void show_sec(void){
-  char data[6];
-  int h,s;
-  int sec_hold=sec; /* 値を生成している最中に，secが変わると嫌なので，   */
-                    /* ここで，secの値を捕まえる。secの値は，ボトムハーフ*/
-                    /* で変化させているので，運が悪いと処理中に変化する。*/
-
-  s=sec_hold % 60;
-  h=(sec_hold / 60); /* ここで，hの値の健全性は，検証していないからね。*/
-                     /* ヒントは，「secは，int型」*/
-
-  data[0]='0'+h/10;
-  data[1]='0'+h%10;
-  data[2]=':';
-  data[3]='0'+ s/10;
-  data[4]='0'+ s%10;
-  data[5]='\0';
-
-  lcd_putstr(16-5,1,data);
 }
 
 int main(void){
@@ -223,9 +202,6 @@ int main(void){
 
 	//半角カタカナ一覧:入力できないなら，ここからコピペせよ。
 	//ｱｲｳｴｵ ｶｷｸｹｺ ｻｼｽｾｿ ﾀﾁﾂﾃﾄ ﾅﾆﾇﾈﾉ ﾊﾋﾌﾍﾎ ﾏﾐﾑﾒﾓ ﾗﾘﾙﾚﾛ ﾔﾕﾖ ﾜｦﾝ ﾞﾟ ｯ ｧｨｩｪｫ
-	
-	//最初は，モード0から実行を想定。
-	lcd_putstr(0,0,"MODE0->MODE0");
 
 	for(;;){	  /* 組み込みシステムは，基本的には無限ループで実行 */
 
