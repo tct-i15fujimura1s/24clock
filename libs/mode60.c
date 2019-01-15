@@ -12,29 +12,31 @@ typedef struct {
 	char x:3;
 } POS;
 
-enum TURN current_turn = TURN_RED;
+static enum TURN current_turn = TURN_RED;
 
 static unsigned int matrix[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 #define IS_RED(p) (matrix[(p.y)] & 1 << (p.x))
 #define IS_GREEN(p) (matrix[(p.y)] & 0x100 << (p.x))
 
-inline void SET_RED(POS p){
+static inline void SET_RED(POS p){
 	matrix[p.y] = matrix[p.y] & ~(0x100 << p.x) | (0x1 << p.x);
 }
 
-inline void SET_GREEN(POS p){
+static inline void SET_GREEN(POS p){
 	matrix[p.y] = matrix[p.y] & ~(0x1 << p.x) | (0x100 << p.x);
 }
 
-POS pointer;
-int show_pointer = FALSE;
+static POS pointer;
+static int show_pointer = FALSE;
 
 static void draw_board();
 static void lcd_refresh();
 static int put(enum TURN turn, POS p);
 static int flip(enum TURN turn, POS p, POS d);
 static int set(enum TURN turn, POS p);
+
+static int com_cycle = 0;
 static void com_routine();
 
 void do_mode60(UI_DATA *ui_data){
@@ -85,18 +87,14 @@ void do_mode60(UI_DATA *ui_data){
 	default:
 	}
 
-	if(tmv_flag){
+	if(tma_flag){
 		draw_board();
 		lcd_refresh();
-		tmv_flag = FALSE;
-	}
-
-	if(sec_flag){
+		
 		if(current_turn == TURN_GREEN){
 			com_routine();
-			current_turn = TURN_RED;
 		}
-		sec_flag = FALSE;
+		tma_flag = FALSE;
 	}
 }
 
@@ -166,6 +164,13 @@ static int set(enum TURN turn, POS p){
 
 static void com_routine(){
 	static int candidate[]; //
+	if(com_cycle >= 8){
+		com_cycle = 0;
+		current_turn = TURN_RED;
+		return;
+	}
 	//評価値=-開放度*10+ひっくり返る石の数
 	//TODO
+	//8サイクルかけてゆっくり処理
+	com_cycle++;
 }
