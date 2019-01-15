@@ -233,8 +233,11 @@ int main(void){
 	  /* 以下のif文の中は，多分，1/32秒ごとに処理を行う*/
 	  if(tma_flag == TRUE){ 
 	    sw = sw_mng();       /* スイッチの入力チェック libs/key.c */
-	    ui_data=ui(sw);           /* ユーザインタフェースの実行 */
 
+	    
+	    
+	    ui_data=ui(sw);           /* ユーザインタフェースの実行 */
+	    
 	    tma_flag=FALSE;
 	  }
 
