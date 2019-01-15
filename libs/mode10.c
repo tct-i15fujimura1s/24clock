@@ -2,7 +2,7 @@
 #include "main.h"
 #include "mode10.h"
 
-volatile TIME time = {0, 0, 0};
+TIME time = {0, 0, 0};
 
 volatile int cursor_position = 0;
 

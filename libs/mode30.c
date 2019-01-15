@@ -10,7 +10,7 @@ void do_mode30(UI_DATA* ud){
     /*必要なら，何らかのモードの初期化処理*/
     lcd_clear();  //0123456789ABCDEF
     lcd_putstr(0,0,"MODE2:show sec"); /*モード2の初期表示*/
-    show_sec();
+    lcd_putdec(0,1,5,sec);
     sec_flag=FALSE;
   }
 

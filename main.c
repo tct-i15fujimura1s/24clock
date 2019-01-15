@@ -1,5 +1,9 @@
 #include "libs.h"       /* 前のmy3664hの内容は，libs/libs.hへ統合した */
 #include "main.h"
+#include "mode0.h"
+#include "mode10.h"
+#include "mode20.h"
+#include "mode30.h"
 
 volatile int tma_flag=FALSE;
 volatile int sec_flag=FALSE;
@@ -8,6 +12,7 @@ volatile int sec=0;
 
 volatile int tempo_flag=FALSE;
 int tempo_compare=0;
+
 
 static unsigned int matrix_led_pattern[8]=
   //{0x007e,0x0011,0x0011,0x0011,0x007e,0x7f00,0x4900,0x4900};
@@ -140,10 +145,6 @@ void mode_go(UI_DATA *ud, int mode) {
   ud->prev_mode = mode;
   ud->mode = mode;
 }
-
-#include "mode0.h"
-#include "mode10.h"
-#include "mode20.h"
 
 UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良く考えて */
   static UI_DATA ui_data={MODE_0,MODE_0,};

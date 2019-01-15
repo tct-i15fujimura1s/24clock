@@ -2,7 +2,7 @@
 #include "main.h"
 #include "mode0.h"
 
-static MENU_MODE mode_add(MENU_MODE mm, int n){
+static int mode_add(int mm, int n){
   mm += n;
   if(mm < MODE_10) mm += MODE_OUT_OF_MAX / 10 * 10; // MODE10より小さくなりそうならMODEの10刻み最大値を足す
   else if(mm > MODE_OUT_OF_MAX) mm -= MODE_OUT_OF_MAX / 10 * 10; // MODEの最大値よりはみ出そうならMODEのの10刻み最大値を引く
