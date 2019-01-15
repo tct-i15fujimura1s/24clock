@@ -2,16 +2,7 @@
 #include "main.h"
 #include "mode0.h"
 
-<<<<<<< HEAD
 static int mode_add(int mm, int n){
-=======
-volatile TIME time = {0, 0, 0};
-volatile char temp[9];
-
-volatile int cursor_position = 0;
-
-static enum MENU_MODE mode_add(enum MENU_MODE mm, int n){
->>>>>>> master
   mm += n;
   if(mm < MODE_10) mm += MODE_OUT_OF_MAX / 10 * 10; // MODE10より小さくなりそうならMODEの10刻み最大値を足す
   else if(mm > MODE_OUT_OF_MAX) mm -= MODE_OUT_OF_MAX / 10 * 10; // MODEの最大値よりはみ出そうならMODEのの10刻み最大値を引く
