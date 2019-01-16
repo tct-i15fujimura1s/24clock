@@ -111,6 +111,7 @@ void do_mode11(UI_DATA *ud) {
     ud->mode = MODE_0;
     break;
   default:
+    break;
   }
   
   // 1秒ごと

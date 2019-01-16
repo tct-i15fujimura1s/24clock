@@ -3,6 +3,26 @@
 #include "mode30.h"
 static unsigned int matrix_led_pattern[8];
 static unsigned int l=0,r=0,u=0,d=0;
+
+static inline void paint() {
+	static int col = 0;
+	/*16bit (1列分)をシリアル転送*/
+	col = col + 1 & 7;
+	unsigned int p, i;
+	for(p = matrix_led_pattern[col], i = 0; i < 16; i++, p <<= 1){
+		if((p&0x8000)==0){
+			DISABLE_MATRIX_SIN();
+		}else{
+			ENABLE_MATRIX_SIN();
+		}
+	}
+	SET_H_MATRIX_SCLK();
+	SET_L_MATRIX_SCLK();
+	ENABLE_MATRIX_BLANK();
+	SELECT_MATRIX_COLUMN(col);
+	DISABLE_MATRIX_BLANK();
+}
+
 void do_mode30(UI_DATA* ud){
   switch(ud->sw){  /*モード内でのキー入力別操作*/
   case KEY_LONG_C:  /* 中央キーの長押し */
@@ -109,10 +129,12 @@ void do_mode30(UI_DATA* ud){
     /* 他のモード遷移した時に実行 もしくは，1秒ごとに表示*/
     /*必要なら，何らかのモードの初期化処理*/
     lcd_clear();  //0123456789ABCDEF
-    lcd_putstr(3,0,"ﾎﾞﾀﾝｦｵｼﾃﾈ"); /*モード2の初期表示*/
+    lcd_putstr(3,0,"\xCE\xDE\xC0\xDD\xA6\xB5\xBC\xC3\xC8"); /*モード2の初期表示: ボタンヲオシテネ*/
     //show_sec();
     sec_flag=FALSE;
   }
+
+  paint();
   
   /*モード2は，真中ボタンが押されたら，MODE0に戻る*/
   switch(ud->sw){    /*モード内でのキー入力別操作*/
