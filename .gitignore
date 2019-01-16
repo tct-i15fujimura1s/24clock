@@ -4,6 +4,7 @@
 *.hexdump
 *.lst
 *.o
+*.a
 *~
 main
 main.s
