@@ -20,8 +20,8 @@ lcd_putstr(4,1,"ﾌﾝﾀｲﾏｰ");
 switch(ud->sw){
 
 case KEY_SHORT_U:
-     i+1;
-     j+1;
+     i=i+1;
+     j=j+1;
      if(i>8){
 	i=0;
      }
@@ -31,8 +31,8 @@ case KEY_SHORT_U:
      break;
 
 case KEY_SHORT_D:
-     i-1;
-     j-1;
+     i=i-1;
+     j=j-1;
      if(i<0){
 	i=8;
      }
