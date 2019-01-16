@@ -2,7 +2,8 @@
 #define MAIN_H
 extern volatile int sec_flag;
 extern volatile int sec;
-extern volatile int sec_flag;
+extern volatile int tma_flag;
+extern volatile int tmv_flag;
 
 extern volatile int tempo_flag;
 extern int tempo_compare;
