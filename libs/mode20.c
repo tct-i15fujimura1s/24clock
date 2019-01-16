@@ -9,7 +9,7 @@ void do_mode20(UI_DATA* ud){
     /*必要なら，何らかのモードの初期化処理*/
     lcd_clear();
     lcd_putstr(0,0,"MODE1"); /*モード1の初期表示*/
-    lcd_putstr(0,1,"TEMPO=120"); /*モード1の初期表示*/
+    lcd_putstr(0,1,"A    =120"); /*モード1の初期表示*/
     tempo=120;
     tempo_compare = 3735 / tempo; /* 1000/(tempo * 16 / 60) を展開 */
   }
