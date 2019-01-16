@@ -1,8 +1,8 @@
 #include "libs.h"
 #include "main.h"
 #include "mode30.h"
-
-
+static unsigned int matrix_led_pattern[8];
+static unsigned int l=0,r=0,u=0,d=0;
 void do_mode30(UI_DATA* ud){
   switch(ud->sw){  /*モード内でのキー入力別操作*/
   case KEY_LONG_C:  /* 中央キーの長押し */
