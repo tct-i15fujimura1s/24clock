@@ -11,12 +11,11 @@ void do_mode10(UI_DATA* ud){
   if(ud->prev_mode!=ud->mode){  /* 他のモードからモード10に遷移した時に実行 */
     /*必要なら，何らかのモードの初期化処理*/
     lcd_putstr(0,0,"MODE1:SET24CLOCK"); /*モード10の初期表示*/
-    lcd_putstr(10,1,"-->\xc4\xb9\xb2");
     lcd_clear();
     lcd_cursor(TRUE);
     lcd_blink(TRUE);
   }
-
+  
   switch(ud->sw){  /*モード内でのキー入力別操作*/
   case KEY_SHORT_U: /* 上短押し */
   case KEY_SHORT_D: /* 下短押し */
@@ -56,29 +55,37 @@ void do_mode10(UI_DATA* ud){
     break;
   }
 
-  if(sec_flag==TRUE){
-    /* 24時間時計 */
-    lcd_putstr(0,1,"  :  :");
-    lcd_putudec(0,1,2,time.hours);
-    lcd_putudec(3,1,2,time.minutes);
-    lcd_putudec(6,1,2,time.seconds);
-
+  if(tma_flag==TRUE){
+    lcd_clear();
+    lcd_putstr(0,0,"MODE1:SET24CLOCK"); /*モード10の表示*/
+    lcd_putstr(10,1,"-->\xc4\xb9\xb2");
+    /* 24時間時計の設定 */
+    lcd_putstr(1,1,"  :  :");
+    lcd_putudec(1,1,2,time.hours);
+    lcd_putudec(4,1,2,time.minutes);
+    lcd_putudec(7,1,2,time.seconds);
+    
     /* カーソルの表示 */
     int value, real_cursor_position;
-    if(cursor_position < 2){
-      value = time.hours;
-      real_cursor_position = cursor_position;
-    }else if(cursor_position < 4){
-      value = time.minutes;
-      real_cursor_position = cursor_position + 1;
-    }else{
-      value = time.seconds;
-      real_cursor_position = cursor_position + 2;
-    }
-    if((cursor_position & 1) == 0){
-      value *= 10;
-    }
-    lcd_putudec(real_cursor_position,1,1,value);
+    char tempstr[2];
+    real_cursor_position = cursor_position < 2
+      ? cursor_position
+      : cursor_position < 4
+      ? cursor_position + 1
+      : cursor_position + 2;
+    tempstr[0] =
+      cursor_position == 0 ? ' ' :
+      cursor_position == 1 ? '0' + time.hours / 10 :
+      cursor_position == 2 ? ':' :
+      cursor_position == 3 ? '0' + time.minutes / 10 :
+      cursor_position == 4 ? ':' : '0' + time.seconds / 10;
+    tempstr[1] = '\0';
+    lcd_putstr(real_cursor_position,1,tempstr);
+
+    tma_flag=FALSE;
+  }
+  
+  if(sec_flag==TRUE){
 
     /*コメント：ここでは，LCDの再描画処理を1秒ごとに行っている。        */
     /*これは，万が一，予期せぬノイズで，LCDの表示に誤動作が発生しても， */
@@ -98,6 +105,13 @@ void do_mode11(UI_DATA *ud) {
     lcd_putstr(0,0,"MODE1:24CLOCK");
     //lcd_putstr(0,2,"\xbe\xaf\xc3\xb2<--");
   }
+
+  switch(ud->sw){
+  case KEY_LONG_C:
+    ud->mode = MODE_0;
+    break;
+  default:
+  }
   
   // 1秒ごと
   if(sec_flag==TRUE) { /* 1秒ごとの処理*/
@@ -112,5 +126,4 @@ void do_mode11(UI_DATA *ud) {
     
     sec_flag = FALSE;
   }
-  
 }
