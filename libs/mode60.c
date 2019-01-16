@@ -18,15 +18,15 @@ static enum TURN current_turn = TURN_RED;
 
 static unsigned int matrix[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
-#define IS_RED(p) (matrix[(p.y)] & 0x100 << (p.x))
-#define IS_GREEN(p) (matrix[(p.y)] & 0x1 << (p.x))
-
-static inline void SET_RED(POS p){
-	matrix[p.y] = matrix[p.y] & ~(0x1 << p.x) | (0x100 << p.x);
-}
+#define IS_RED(p) (matrix[(p.x)] & 0x100 << (p.y))
+#define IS_GREEN(p) (matrix[(p.x)] & 0x1 << (p.y))
 
 static inline void SET_GREEN(POS p){
-	matrix[p.y] = matrix[p.y] & ~(0x100 << p.x) | (0x1 << p.x);
+	matrix[p.x] = matrix[p.x] & ~(0x1 << p.y) | (0x100 << p.y);
+}
+
+static inline void SET_RED(POS p){
+	matrix[p.x] = matrix[p.x] & ~(0x100 << p.y) | (0x1 << p.y);
 }
 
 static POS pointer;
@@ -55,6 +55,9 @@ void do_mode60(UI_DATA *ui_data){
 	switch(ui_data->sw){//FIXME
 	case KEY_LONG_R: 	//DEBUG
 		set(TURN_RED, pointer);
+		break;
+	case KEY_LONG_L: 	//DEBUG
+		set(TURN_GREEN, pointer);
 		break;
 	case KEY_SHORT_U:
 		pointer.y = pointer.y + 7 & 7;
