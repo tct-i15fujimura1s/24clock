@@ -99,14 +99,14 @@ void do_mode60(UI_DATA *ui_data){
 
 static void refresh(){
 	lcd_clear();
-	lcd_putstr(0,0,"MODE6:\xB5\xBE\xDB"); // 「オセロ」
+	lcd_putstr(0,0,"MODE6:" HK_O HK_SE HK_RO); // 「オセロ」
 	if(current_turn == TURN_RED){
-	  lcd_putstr(0,1,"   \xB3\xC2    \xCA\xDF\xBD"); // 「ウツ」「パス」
+	  lcd_putstr(0,1,"   " HK_U HK_TU "    " HK_HA HK_HANDAKUTEN HK_SU); // 「ウツ」「パス」
 		if(show_pointer){
-			lcd_putstr(0, 1, "\xc6\xb1 \xB3\xC2      UDLRC");
+			lcd_putstr(0, 1, HK_NI HK_A " " HK_U HK_TU "      UDLRC");
 		}else{
 			lcd_putstr(13, 1, "LRC");
-			lcd_putstr(pointer.x == 0 ? 0 : 6, 1, "\xc6\xb1"); //「ﾆｱ」
+			lcd_putstr(pointer.x == 0 ? 0 : 6, 1, HK_NI HK_A); //「ﾆｱ」
 		}
 		DISABLE_LED_GREEN();
 		ENABLE_LED_RED();
