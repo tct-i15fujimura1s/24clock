@@ -53,6 +53,9 @@ void do_mode60(UI_DATA *ui_data){
 	}
 
 	switch(ui_data->sw){//FIXME
+	case KEY_LONG_R: 	//DEBUG
+		set(TURN_RED, pointer);
+		break;
 	case KEY_SHORT_U:
 		pointer.y = pointer.y + 7 & 7;
 		break;
