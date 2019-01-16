@@ -21,6 +21,7 @@ enum MENU_MODE{
   MODE_20 = 20,
   MODE_30 = 30,
   MODE_40 = 40,
+  MODE_50 = 50,
   MODE_OUT_OF_MAX
 };
 

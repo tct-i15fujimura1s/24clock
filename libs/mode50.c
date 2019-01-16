@@ -1,3 +1,6 @@
+#include "libs.h"
+#include "main.h"
+#include "mode50.h"
 void do_mode50(UI_DATA* ud){
   static int tempo=120;
   static int sound=1;
