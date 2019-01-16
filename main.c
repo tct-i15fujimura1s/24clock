@@ -4,6 +4,7 @@
 #include "mode10.h"
 #include "mode20.h"
 #include "mode30.h"
+#include "mode40.h"
 
 volatile int tma_flag=FALSE;
 volatile int sec_flag=FALSE;
@@ -165,8 +166,12 @@ UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良�
     break;
   case MODE_20:
     do_mode20(&ui_data);
+break;
   case MODE_30:
     do_mode30(&ui_data);
+    break;
+  case MODE_40:
+    do_mode40(&ui_data);
     break;
   default:
     break;
