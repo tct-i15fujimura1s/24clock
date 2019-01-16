@@ -1,7 +1,6 @@
 #include "libs.h"
 #include "main.h"
-#include "mode20.h"
-
+#include "mode0.h"
 
 static char time_data_arr[9]={03,04,05,06,07,08,09,10,\0};
 static int i = 0;
@@ -56,6 +55,5 @@ default:
  break;
 
 
-}
 }
 	
