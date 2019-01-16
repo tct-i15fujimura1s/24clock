@@ -2,6 +2,13 @@
 #include "main.h"
 #include "mode60.h"
 
+/*よく使うかもしれない文字列を定義*/
+#define S_ANATA HK_A HK_NA HK_TA
+#define S_KONPYU_TA HK_KO HK_N HK_HI HK_HANDAKUTEN HK_YU_SMALL HK_ONBIKI HK_TA /*Are you happy?*/
+#define S_PASU HK_HA HK_HANDAKUTEN HK_SU
+#define S_UTU HK_U HK_TU
+#define S_NIA HK_NI HK_A /*カーソルのメタファー*/
+
 enum TURN {
 	TURN_RED,
 	TURN_GREEN
@@ -20,6 +27,7 @@ static unsigned int matrix[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 #define IS_RED(p) (matrix[(p.x)] & 0x100 << (p.y))
 #define IS_GREEN(p) (matrix[(p.x)] & 0x1 << (p.y))
+#define IS_EITHER(p) (matrix[(p.x)] & 0x101 << (p.y))
 
 static inline void SET_GREEN(POS p){
 	matrix[p.x] = matrix[p.x] & ~(0x1 << p.y) | (0x100 << p.y);
@@ -28,6 +36,8 @@ static inline void SET_GREEN(POS p){
 static inline void SET_RED(POS p){
 	matrix[p.x] = matrix[p.x] & ~(0x100 << p.y) | (0x1 << p.y);
 }
+
+static int wait_frames = 0;
 
 static POS pointer;
 static int show_pointer = FALSE;
@@ -49,10 +59,9 @@ void do_mode60(UI_DATA *ui_data){
 		matrix[3] = 0x1008;
 		matrix[4] = 0x0810;
 		matrix[5] = matrix[6] = matrix[7] = 0x0000;
-	        refresh();
 	}
 
-	switch(ui_data->sw){//FIXME
+	switch(ui_data->sw){
 	case KEY_LONG_R: 	//DEBUG
 		set(TURN_RED, pointer);
 		break;
@@ -73,7 +82,6 @@ void do_mode60(UI_DATA *ui_data){
 		break;
 	case KEY_SHORT_C:
 		if(show_pointer){
-			//TODO: put
 			if(put(TURN_RED, pointer)){
 				current_turn = TURN_GREEN;
 				show_pointer = FALSE;
@@ -83,6 +91,9 @@ void do_mode60(UI_DATA *ui_data){
 				pointer.x = pointer.y = 0;
 				show_pointer = TRUE;
 			}else{
+				current_turn = TURN_GREEN;
+				lcd_putstr(0, 1, S_ANATA ":" S_PASU);
+				wait_frames = 10;
 				//TODO: pass
 			}
 		}
@@ -94,9 +105,15 @@ void do_mode60(UI_DATA *ui_data){
 	  break;
 	}
 
+	static unsigned int frame = 0;
 	if(tma_flag){
-		refresh();
-		if(current_turn == TURN_GREEN){
+		frame++;
+		if(wait_frames > 0){
+			wait_frames--;
+			return;
+		}
+		if(frame & 4) refresh();
+		if(frame & 8 && current_turn == TURN_GREEN){
 			com_routine();
 		}
 		tma_flag = FALSE;
@@ -107,12 +124,12 @@ static void refresh(){
 	lcd_clear();
 	lcd_putstr(0,0,"MODE6:" HK_O HK_SE HK_RO); // 「オセロ」
 	if(current_turn == TURN_RED){
-	  lcd_putstr(0,1,"   " HK_U HK_TU "    " HK_HA HK_HANDAKUTEN HK_SU); // 「ウツ」「パス」
+	  lcd_putstr(0,1,"   " S_UTU "    " S_PASU); // 「ウツ」「パス」
 		if(show_pointer){
-			lcd_putstr(0, 1, HK_NI HK_A " " HK_U HK_TU "      UDLRC");
+			lcd_putstr(0, 1, S_NIA " " S_UTU "      UDLRC");
 		}else{
 			lcd_putstr(13, 1, "LRC");
-			lcd_putstr(pointer.x == 0 ? 0 : 6, 1, HK_NI HK_A); //「ﾆｱ」
+			lcd_putstr(pointer.x == 0 ? 0 : 6, 1, S_NIA); //「ﾆｱ」
 		}
 		DISABLE_LED_GREEN();
 		ENABLE_LED_RED();
@@ -153,25 +170,11 @@ static int flip(enum TURN turn, POS p, POS d){
 			if(IS_RED(q)) break;
 			if(!IS_GREEN(q)) return 0;
 		}
-		if(!p.is_simulation) for(q = p, P_ADD(q, d), i = 0; i < flipped; i++, P_ADD(q, d)) SET_RED(q);
 		//REDはプレイヤーなのでcomputes_opennessはいらない
 	}else{
 		for(q = p, P_ADD(q, d); IS_WITHIN_RECT8(q); flipped++, P_ADD(q, d)){
 			if(IS_GREEN(q)) break;
 			if(!IS_RED(q)) return 0;
-		}
-		if(!p.is_simulation) for(q = p, P_ADD(q, d), i = 0; i < flipped; i++, P_ADD(q, d)) SET_GREEN(q);
-		if(p.computes_openness){
-			q = p;
-			P_ADD(q, d);
-			s = q;
-			P_ADD(s, d);
-			t = q;
-			t.x = q.x + 1;
-			if(IS_WITHIN_RECT8(t) && !IS_RED(t) && !IS_GREEN(t)) flipped += 0x100;
-			t.x = q.x - 1;
-			if(IS_WITHIN_RECT8(t) && !IS_RED(t) && !IS_GREEN(t)) flipped += 0x100;
-			
 		}
 	}
 	return flipped;
@@ -182,25 +185,66 @@ static void set(enum TURN turn, POS p){
 	else SET_GREEN(p);
 }
 
-struct CANDIDATE {
+typedef struct {
 	unsigned char flips: 4;
 	unsigned char openness: 4;
-};
+} CANDIDATE;
+
 static void com_routine(){
-	static struct CANDIDATE candidates[64];
-	static int n_candidates;
-	POS p;
-	if(cycle >= 9){
+	static POS cp;
+	static CANDIDATE candidate;
+	static int candidates;
+	POS p, q, d, t;
+	int i, flips, openness;
+	if(cycle == 0){
+		candidates = 0;
+		candidate.openness = 0;
+		candidate.flips = 0;
+	}
+	if(cycle < 8){//ちょっと長いんだよね・・・もっと分割していい？
+		p.x = cycle;
+		for(p.y = 0; p.y < 8; p.y++) if(IS_GREEN(p)) for(i = 8; i != 0; i--) {
+			d.x = (i%3+1)%3-1;
+			d.y = (i/3+1)%3-1;
+			flips = openness = 0;
+			for(q = p, P_ADD(q, d); IS_WITHIN_RECT8(q); P_ADD(q, d)){
+				if(IS_GREEN(q)){//自分の色に挟まれていると取れない
+					flips = 0;
+					break;
+				}
+				if(IS_RED(q)){//取れるかも？
+					flips++;
+					t = q; t.x -= d.x; if(!IS_EITHER(t)) openness++;
+					t.y += d.y; if(!IS_EITHER(t)) openness++;
+					t = q; t.y -= d.y; if(!IS_EITHER(t)) openness++;
+					t.x += d.x; if(!IS_EITHER(t)) openness++;
+				}else{//取れたかも？
+					t = q; t.x -= d.x; if(!IS_EITHER(t)) openness++;
+					t = q; t.y -= d.y; if(!IS_EITHER(t)) openness++;
+					break;
+				}
+			}
+			if(flips == 0) continue;//残念、1つも取れなかった。次
+			//どうやら何かしら取れたらしい
+			if(candidate.openness < openness || candidate.openness == openness && candidate.flips < flips){
+				cp = p;
+				candidate.openness = openness;
+				candidate.flips = flips;
+				candidates++;
+			}
+		}
+	}else if(cycle < 9){
+		if(candidates == 0){
+			wait_frames = 10;
+			lcd_putstr(0,1,S_KONPYU_TA ":" S_PASU);
+			//TODO:pass
+		}else{
+			put(TURN_GREEN, cp);
+		}
+	}else{
 		cycle = 0;
 		current_turn = TURN_RED;
-		n_candidates = 0;
 		return;
-	}
-	if(cycle < 8){
-		p.y = cycle;
-		for(p.x = 0; p.x < 8; p.x++) {
-			
-		}
 	}
 	//評価値=-開放度*10+ひっくり返る石の数
 	//TODO
