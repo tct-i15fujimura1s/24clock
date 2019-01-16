@@ -6,8 +6,8 @@ OBJS1=wait.o lcd.o util.o lcd_util.o matrix.o key.o timer.o ir.o speaker.o
 SRCS2=serial.c ADconv.c eeprom.c watchdog.c led.c
 OBJS2=serial.o ADconv.o eeprom.o watchdog.o led.o
 
-SRCS3=time.c mode0.c mode10.c mode20.c mode30.c mode40.c mode50.c
-OBJS3=time.o mode0.o mode10.o mode20.o mode30.o mode40.o mode50.o
+SRCS3=time.c mode0.c mode10.c mode20.c mode30.c mode40.c mode50.c mode60.c
+OBJS3=time.o mode0.o mode10.o mode20.o mode30.o mode40.o mode50.o mode60.o
 
 SRCS=$(SRCS1) $(SRCS2) $(SRCS3)
 OBJS=$(OBJS1) $(OBJS2) $(OBJS3)
@@ -55,3 +55,4 @@ mode20.o: mode20.c mode20.h libs.h main.h
 mode30.o: mode30.c mode30.h libs.h main.h
 mode40.o: mode40.c mode40.h libs.h main.h
 mode50.o: mode50.c mode50.h libs.h main.h
+mode60.o: mode60.c mode60.h libs.h main.h

@@ -1,3 +1,5 @@
+#include "libs.h"
+#include "main.h"
 #include "mode60.h"
 
 enum TURN {
@@ -12,9 +14,9 @@ typedef struct {
 	char x:3;
 } POS;
 
-static enum TURN current_turn = TURN_RED;
+static unsigned int matrix[8];
 
-static unsigned int matrix[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+static enum TURN current_turn = TURN_RED;
 
 #define IS_RED(p) (matrix[(p.y)] & 0x100 << (p.x))
 #define IS_GREEN(p) (matrix[(p.y)] & 0x1 << (p.x))
@@ -30,8 +32,7 @@ static inline void SET_GREEN(POS p){
 static POS pointer;
 static int show_pointer = FALSE;
 
-static void draw_board();
-static void lcd_refresh();
+static void refresh();
 static int put(enum TURN turn, POS p);
 static int flip(enum TURN turn, POS p, POS d);
 static void set(enum TURN turn, POS p);
@@ -48,14 +49,16 @@ void do_mode60(UI_DATA *ui_data){
 		matrix[3] = 0x1008;
 		matrix[4] = 0x0810;
 		matrix[5] = matrix[6] = matrix[7] = 0x0000;
-		each_turn_begins();
+	        refresh();
 	}
 
 	switch(ui_data->sw){//FIXME
 	case KEY_SHORT_U:
 		pointer.y = pointer.y + 7 & 7;
+		break;
 	case KEY_SHORT_D:
 		pointer.y = pointer.y + 1 & 7;
+		break;
 	case KEY_SHORT_L:
 		pointer.x = show_pointer ? pointer.x + 7 & 7 : !pointer.x;
 		break;
@@ -82,11 +85,11 @@ void do_mode60(UI_DATA *ui_data){
 		ui_data->mode = MODE_0;
 		break;
 	default:
+	  break;
 	}
 
 	if(tma_flag){
-		draw_board();
-		lcd_refresh();
+		refresh();
 		
 		if(current_turn == TURN_GREEN){
 			com_routine();
@@ -95,37 +98,16 @@ void do_mode60(UI_DATA *ui_data){
 	}
 }
 
-static void draw_board() {
-	static int col = 0;
-	/*16bit (1列分)をシリアル転送*/
-	col = col + 1 & 7;
-	unsigned int p;
-	for(p = matrix[col], i = 0; i < 16; i++, p <<= 1){
-		if((p&0x8000)==0){
-			DISABLE_MATRIX_SIN();
-		}else{
-			ENABLE_MATRIX_SIN();
-		}
-	}
-	SET_H_MATRIX_SCLK();
-	SET_L_MATRIX_SCLK();
-	ENABLE_MATRIX_BLANK();
-	DISABLE_MATRIX_LATCH();
-	ENABLE_MATRIX_LATCH();
-	SELECT_MATRIX_COLUMN(col);
-	DISABLE_MATRIX_BLANK();
-}
-
-static void lcd_refresh(){
+static void refresh(){
 	lcd_clear();
-	lcd_putstr(0,0,"MODE7:OTHELLO");
+	lcd_putstr(0,0,"MODE6:\xB5\xBE\xDB"); // 「オセロ」
 	if(current_turn == TURN_RED){
-		lcd_putstr(0,1,"  put  pass");
+	  lcd_putstr(0,1,"   \xB3\xC2    \xCA\xDF\xBD"); // 「ウツ」「パス」
 		if(show_pointer){
-			lcd_putstr(0, 1, "\xc6\xb1put      UDLRC");
+			lcd_putstr(0, 1, "\xc6\xb1 \xB3\xC2      UDLRC");
 		}else{
 			lcd_putstr(13, 1, "LRC");
-			lcd_putstr(pointer.x == 0 ? 4 : 9, 1, "\xc6\xb1"); //「ﾆｱ」
+			lcd_putstr(pointer.x == 0 ? 0 : 6, 1, "\xc6\xb1"); //「ﾆｱ」
 		}
 		//TODO: make the full-color led red
 		DISABLE_LED_GREEN();
@@ -134,6 +116,11 @@ static void lcd_refresh(){
 		//TODO: make the full-color led green
 		DISABLE_LED_RED();
 		ENABLE_LED_GREEN();
+	}
+	int i;
+	for(i = 0; i < 8; i++) matrix_led_pattern[i] = matrix[i];
+	if(show_pointer){
+	  matrix_led_pattern[pointer.x] |= 0x101 << pointer.y;
 	}
 }
 
