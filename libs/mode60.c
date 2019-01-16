@@ -51,7 +51,7 @@ void do_mode60(UI_DATA *ui_data){
 		each_turn_begins();
 	}
 
-	switch(ui_data->key){//FIXME
+	switch(ui_data->sw){//FIXME
 	case KEY_SHORT_U:
 		pointer.y = pointer.y + 7 & 7;
 	case KEY_SHORT_D:
@@ -79,7 +79,7 @@ void do_mode60(UI_DATA *ui_data){
 		}
 		break;
 	case KEY_LONG_C:
-		ui_data->next_mode = MODE_0;
+		ui_data->mode = MODE_0;
 		break;
 	default:
 	}
