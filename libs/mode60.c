@@ -14,9 +14,9 @@ typedef struct {
 	char x:3;
 } POS;
 
-static unsigned int matrix[8];
-
 static enum TURN current_turn = TURN_RED;
+
+static unsigned int matrix[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 #define IS_RED(p) (matrix[(p.y)] & 0x100 << (p.x))
 #define IS_GREEN(p) (matrix[(p.y)] & 0x1 << (p.x))
@@ -90,7 +90,6 @@ void do_mode60(UI_DATA *ui_data){
 
 	if(tma_flag){
 		refresh();
-		
 		if(current_turn == TURN_GREEN){
 			com_routine();
 		}
@@ -109,11 +108,9 @@ static void refresh(){
 			lcd_putstr(13, 1, "LRC");
 			lcd_putstr(pointer.x == 0 ? 0 : 6, 1, "\xc6\xb1"); //「ﾆｱ」
 		}
-		//TODO: make the full-color led red
 		DISABLE_LED_GREEN();
 		ENABLE_LED_RED();
 	}else{
-		//TODO: make the full-color led green
 		DISABLE_LED_RED();
 		ENABLE_LED_GREEN();
 	}
