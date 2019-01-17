@@ -105,6 +105,7 @@ UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良�
   default:
     break;
  }
+}
 #  endif
 
 #endif
