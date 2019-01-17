@@ -13,7 +13,6 @@ void do_mode10(UI_DATA* ud){
     lcd_putstr(0,0,"MODE1:SET24CLOCK"); /*モード10の初期表示*/
     lcd_clear();
     lcd_cursor(TRUE);
-    lcd_blink(TRUE);
   }
   
   switch(ud->sw){  /*モード内でのキー入力別操作*/
@@ -41,13 +40,11 @@ void do_mode10(UI_DATA* ud){
 
   case KEY_LONG_R: /* 右長押し */
     lcd_cursor(FALSE);
-    lcd_blink(FALSE);
     ud->mode = MODE_11; /* 時計画面に */
     break;
 
   case KEY_LONG_C: /* 中央キーの長押し */
     lcd_cursor(FALSE);
-    lcd_blink(FALSE);
     ud->mode=MODE_0; /* メニューに移動 */
     break;
 
