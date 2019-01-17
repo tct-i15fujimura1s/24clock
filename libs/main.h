@@ -58,7 +58,7 @@ typedef struct _UI_DATA{
 #include "mode60.h"
 
 #  ifdef MODE0_C
-char tithe_mode_titles[][7] = {
+char *tithe_mode_titles[] = {
   mode0_title,
   mode10_title,
   mode20_title,
