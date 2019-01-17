@@ -2,6 +2,8 @@
 #include "main.h"
 #include "mode20.h"
 
+char mode20_title[] = HK_RA HK_ONBIKI HK_ME HK_N;
+
 void do_mode20(UI_DATA* ud){
   static int tempo=120;
 
