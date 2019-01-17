@@ -1,6 +1,9 @@
 #include "libs.h"
 #include "main.h"
 #include "mode30.h"
+
+char mode30_title[] = HK_YA HK_SI HK_DAKUTEN HK_RU HK_SI;
+
 static unsigned int l=0,r=0,u=0,d=0;
 static const unsigned int pattern[8] = {0x0018, 0x003c, 0x007e, 0x00db, 0x0099, 0x0018, 0x0018, 0x0018};
 
