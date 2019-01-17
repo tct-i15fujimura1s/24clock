@@ -8,25 +8,24 @@
 #define S_PASU HK_HA HK_HANDAKUTEN HK_SU
 #define S_UTU HK_U HK_TU
 #define S_NIA HK_NI HK_A /*カーソルのメタファー*/
+#define S_16 "                " /*スペース×16*/
 
 enum TURN {
 	TURN_RED,
 	TURN_GREEN
 };
 
-typedef struct {
-	char computes_openness:1;
-	char is_simulation:1;
-	char y:3;
-	char x:3;
+typedef struct { /*オーバーフロー前提なので3bitでは足りない*/
+	char y;
+	char x;
 } POS;
 
 static enum TURN current_turn = TURN_RED;
 
-static unsigned int matrix[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+static unsigned int matrix[8];
 
-#define IS_RED(p) (matrix[(p.x)] & 0x100 << (p.y))
-#define IS_GREEN(p) (matrix[(p.x)] & 0x1 << (p.y))
+#define IS_RED(p) (matrix[(p.x)] & 0x1 << (p.y))
+#define IS_GREEN(p) (matrix[(p.x)] & 0x100 << (p.y))
 #define IS_EITHER(p) (matrix[(p.x)] & 0x101 << (p.y))
 
 static inline void SET_GREEN(POS p){
@@ -85,6 +84,10 @@ void do_mode60(UI_DATA *ui_data){
 			if(put(TURN_RED, pointer)){
 				current_turn = TURN_GREEN;
 				show_pointer = FALSE;
+			}else{
+			  lcd_putstr(0,1,S_16);
+			  lcd_putstr(0,1,HK_SO HK_KO HK_NI HK_HA " " HK_U HK_TE HK_MA HK_SE HK_N);
+			  wait_frames = 5;
 			}
 		}else{
 			if(pointer.x == 0){
@@ -92,6 +95,7 @@ void do_mode60(UI_DATA *ui_data){
 				show_pointer = TRUE;
 			}else{
 				current_turn = TURN_GREEN;
+				lcd_putstr(0, 1, S_16);
 				lcd_putstr(0, 1, S_ANATA ":" S_PASU);
 				wait_frames = 10;
 				//TODO: pass
@@ -99,8 +103,10 @@ void do_mode60(UI_DATA *ui_data){
 		}
 		break;
 	case KEY_LONG_C:
-		ui_data->mode = MODE_0;
-		break;
+	  DISABLE_LED_RED();
+	  DISABLE_LED_GREEN();
+	  ui_data->mode = MODE_0;
+	  break;
 	default:
 	  break;
 	}
@@ -123,6 +129,7 @@ void do_mode60(UI_DATA *ui_data){
 static void refresh(){
 	lcd_clear();
 	lcd_putstr(0,0,"MODE6:" HK_O HK_SE HK_RO); // 「オセロ」
+	if(show_pointer)lcd_putstr(15,0,IS_RED(pointer)?IS_GREEN(pointer)?"B":"R":IS_GREEN(pointer)?"G":" ");//debug: both/red/green/none
 	if(current_turn == TURN_RED){
 	  lcd_putstr(0,1,"   " S_UTU "    " S_PASU); // 「ウツ」「パス」
 		if(show_pointer){
@@ -154,7 +161,7 @@ static int put(enum TURN turn, POS p){
 		d.y = (i/3+1)%3-1;
 		flipped += flip(turn, p, d);
 	}
-	if(!p.is_simulation && flipped != 0) set(turn, p); //もし1つでもひっくりかえせていれば置く
+	if(flipped != 0) set(turn, p); //もし1つでもひっくりかえせていれば置く
 	return flipped;
 }
 
@@ -170,12 +177,13 @@ static int flip(enum TURN turn, POS p, POS d){
 			if(IS_RED(q)) break;
 			if(!IS_GREEN(q)) return 0;
 		}
-		//REDはプレイヤーなのでcomputes_opennessはいらない
+		for(i = 0, q = p, P_ADD(q, d); i < flipped; i++, P_ADD(q, d)) SET_RED(q);
 	}else{
 		for(q = p, P_ADD(q, d); IS_WITHIN_RECT8(q); flipped++, P_ADD(q, d)){
 			if(IS_GREEN(q)) break;
 			if(!IS_RED(q)) return 0;
 		}
+		for(i = 0, q = p, P_ADD(q, d); i < flipped; i++, P_ADD(q, d)) SET_GREEN(q);
 	}
 	return flipped;
 }
@@ -236,6 +244,7 @@ static void com_routine(){
 	}else if(cycle < 9){
 		if(candidates == 0){
 			wait_frames = 10;
+			lcd_putstr(0,1,S_16);
 			lcd_putstr(0,1,S_KONPYU_TA ":" S_PASU);
 			//TODO:pass
 		}else{
