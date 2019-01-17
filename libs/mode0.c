@@ -11,16 +11,24 @@ static int mode_add(int mm, int n){
 
 void do_mode0(UI_DATA* ud){
   static int next_mode_data=MODE_10;
+  int i;
 
   if(ud->prev_mode!=ud->mode){  /* 他のモードからモード0に遷移した時に実行 */
     /*必要なら，何らかのモードの初期化処理*/
+    for(i = 0; i < 8; i++) matrix_led_pattern[i] = 0x0000;
+    DISABLE_LED_RED();
+    DISABLE_LED_GREEN();
+    DISABLE_LED_BLUE();
   }
 
-  lcd_clear();
-  lcd_putstr(0,0,"-> MODE"); /*モード0の初期表示*/
-  lcd_putstr(0,1,"   MODE");
-  lcd_putudec(7,0,1,next_mode_data/10);
-  lcd_putudec(7,1,1,mode_add(next_mode_data,10)/10);
+  if(tma_flag==TRUE){
+    lcd_clear();
+    lcd_putstr(0,0,"-> MODE"); /*モード0の初期表示*/
+    lcd_putstr(0,1,"   MODE");
+    lcd_putudec(7,0,1,next_mode_data/10);
+    lcd_putudec(7,1,1,mode_add(next_mode_data,10)/10);
+    tma_flag=FALSE;
+  }
 
   switch(ud->sw){  /*モード内でのキー入力別操作*/
 
@@ -38,10 +46,6 @@ void do_mode0(UI_DATA* ud){
 
   default: /*上記以外*/
     break;
-  }
-
-  if(sec_flag==TRUE){
-    sec_flag=FALSE;
   }
 
 }
