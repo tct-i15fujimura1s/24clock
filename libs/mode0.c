@@ -2,6 +2,8 @@
 #include "main.h"
 #include "mode0.h"
 
+char mode0_title[] = HK_ME HK_NI HK_YU_SMALL HK_ONBIKI;
+
 static int mode_add(int mm, int n){
   mm += n;
   if(mm < MODE_10) mm += MODE_OUT_OF_MAX / 10 * 10; // MODE10より小さくなりそうならMODEの10刻み最大値を足す
