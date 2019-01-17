@@ -105,6 +105,10 @@ UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良�
   default:
     break;
  }
+  
+  ui_data.prev_mode=prev_mode;
+
+  return &ui_data;
 }
 #  endif
 
