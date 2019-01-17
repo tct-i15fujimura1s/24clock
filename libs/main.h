@@ -11,6 +11,7 @@ extern unsigned int matrix_led_pattern[8];
 extern volatile int tempo_flag;
 extern int tempo_compare;
 
+#  if defined(MAIN_C) || defined(MODE0_C)
 /* 適切なモード名を入れることが望ましいが，MODE_0〜とする。 */
 /* 美しい書き方をするならば，適切なテーブルを持つ必要がある */
 enum MENU_MODE{
@@ -26,6 +27,7 @@ enum MENU_MODE{
   MODE_60 = 60,
   MODE_OUT_OF_MAX
 };
+#  endif
 
 //うぅ。下記のKとkの見分け(大文字小文字の見分け)が付かずに，
 //１時間半の痛恨のロス(2011/12/19 00:37 by T.NITTA)
