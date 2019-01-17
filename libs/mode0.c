@@ -13,6 +13,7 @@ static int mode_add(int mm, int n){
 
 void do_mode0(UI_DATA* ud){
   static int next_mode_data=MODE_10, next_mode_data2 = MODE_20;
+  static int cycle = 0;
   int i;
 
   if(ud->prev_mode!=ud->mode){  /* 他のモードからモード0に遷移した時に実行 */
@@ -24,13 +25,16 @@ void do_mode0(UI_DATA* ud){
   }
 
   if(tma_flag==TRUE){
-    lcd_clear();
-    lcd_putstr(0,0,"-> MODE");
-    lcd_putstr(8,0,tithe_mode_titles[next_mode_data/10]);
-    lcd_putstr(8,1,tithe_mode_titles[next_mode_data2/10]);
-    lcd_putstr(0,1,"   MODE");
-    lcd_putudec(7,0,1,next_mode_data/10);
-    lcd_putudec(7,1,1,next_mode_data2/10);
+    if(cycle == 0){
+      lcd_clear();
+      lcd_putstr(0,0,"-> MODE");
+      lcd_putstr(9,0,tithe_mode_titles[next_mode_data/10]);
+      lcd_putstr(9,1,tithe_mode_titles[next_mode_data2/10]);
+      lcd_putstr(0,1,"   MODE");
+      lcd_putudec(7,0,1,next_mode_data/10);
+      lcd_putudec(7,1,1,next_mode_data2/10);
+    }
+    cycle = (cycle + 1) & 3;
     tma_flag=FALSE;
   }
 
