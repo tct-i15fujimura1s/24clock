@@ -80,29 +80,42 @@ void do_mode71(UI_DATA *ud){
  *     地面は、一つ前のmapから生成される。また、ある高さに地面がある場合、それより下はすべて地面になる。また、地面の高さは0以上4以下である。
  *     プレイヤーは地面がないと落ちる。そしてplayerY < -1になると死ぬ(SE要件)。
  *** アイテムの生成
- *     アイテムは、緑のドットで表現され、地面から1~3ドット離れた高さに生成される。
+ *     アイテムは、緑のドットで表現され、地面から1~4ドット離れた高さに生成される。
  *     アイテムを取るとスコアに加算される(SE要件)。
  ** ゴール
  *     ゴールは赤い縦長の旗であらわされる。
  *     ゴールに触れるとクリアとなり、ハイスコアの更新処理をしてMODE_71に移行する。
  */
-//static const unsigned int goalMap = {0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0xE080, 0xC080};
+static const unsigned int goalMap = {0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0xE080, 0xC080};
+
+typedef struct {
+	unsigned char U:1;
+	unsigned char D:1;
+	unsigned char L:1;
+	unsigned char R:1;
+	unsigned char C:1;
+} KEY_DATA;
 
 static unsigned int nextFrame(){
 	static unsigned int count = 0;
 	count = (count + 1) & 0x7;
 	return !count;
 }
+static unsigned int generateMapColumn();
+static KEY_DATA getKeyData();
+static unsigned int rand();
 
+#define GROUND(p) ((((p) & 0xff00) >> 8) & (p))
 #define IS_GROUND(x, y) (map[x] && (0x0101 << (y)))
+#define IS_ITEM(x, y) (map[x] && (0x0001 << (y)))
 
 static int score = 0, time = 0;
 static unsigned int map[8];
 void do_mode72(UI_DATA *ud){
 	static int playerX = 0, playerVY = 1, playerY = 1, isJumping = FALSE, mapX = 7;
 
-
 	int i;
+	KEY_DATA key = getKeyData();
 
 	if(ud->prev_mode!=ud->mode){
 		//MODE71の初期表示
@@ -111,6 +124,11 @@ void do_mode72(UI_DATA *ud){
 		lcd_putstr(0,1,"I...............");
 		score = 0;
 		time = 100;
+
+		//初期マップを生成
+		map[0] = 0x0303;
+		map[1] = 0x0303;
+		for(i = 2; i < 8; i++) map[i] = generateMapColumn(i);
 	}
 
 	if(ud->sw == KEY_LONG_C){//終了
@@ -119,22 +137,38 @@ void do_mode72(UI_DATA *ud){
 	if(tma_flag==TRUE && nextFrame()){
 		if(isJumping){//ジャンプ、または落下中
 			//足元に地面があるか？
-			for(i = 0; i < playerVY; i++) if(IS_GROUND(playerX, playerY + i)) break;
-			if(i != playerVY){
+			for(i = 0; i < playerVY; i++) if(IS_GROUND(playerX, playerY + i + 1)) break;
+			if(i != playerVY){//地面がある
 				playerY += i;
 				isJumping = FALSE;
-			}else{
-				playerY += playerVY++;
+			}else{//地面がない
+				playerY += playerVY++;//加速度1[dot/frame^2]
+			}
+		}else{
+			if(!IS_GROUND(playerX, playerY + 1)){//足元に地面がない
+				isJumping = TRUE;
+			}else if(key.U){//ジャンプ
+				isJumping = TRUE;
+				playerVY = -3;//速度-3[dot/frame]
 			}
 		}
-		if(!isJumping && /*TODO*/){//ジャンプ
-			isJumping = TRUE;
-			playerVY = 4;
+		if(IS_ITEM(playerX, playerY)){//もし下半身がアイテムと重なっていたら
+			map[playerX] ^= 0x0001 << playerY;//アイテムを消す
+			score += 1;
 		}
-		if(/*TODO*/){//右へ
-			if(playerX > 4 && mapX < 63){//スクロール
+		if(IS_ITEM(playerX, playerY+1)){
+			map[playerX] ^= 0x0001 << (playerY + 1);//アイテムを消す
+			score += 1;
+		}
+		if(key.R){//右へ
+			if(playerX > 4 && mapX < 127){//スクロール
+				mapX++;
 				for(i = 0; i < 7; i++) map[i] = map[i + 1]; //ずらす
-				generateMapColumn();
+				if(mapX < 120){//最後のマップ以外は
+					map[8] = generateMapColumn(8);
+				}else{//最後のマップは
+					map[8] = goalMap[mapX & 3];//専用のマップを使う
+				}
 			}else if(playerX < 7){//動ける
 				playerX++;
 				if(playerX == 126){//ゴール
@@ -146,19 +180,99 @@ void do_mode72(UI_DATA *ud){
 				}
 			}
 		}
-		if(/*TODO*/){//左へ
+		if(key.L){//左へ
 			if(playerX >= 0){//動ける
 				playerX--;
 			}
 		}
+
+		//描画など
+		for(i = 0; i < 8; i++) matrix_led_pattern[i] = map[i];
+		if(playerY >= 0){
+			matrix_led_pattern[playerX] |= 0x0100 << playerY; //下半身
+			if(playerY != 0) matrix_led_pattern[playerX] |= 0x0100 << (playerY -1); //上半身
+		}
+
+		lcd_putstr(0,1,"................");
+		lcd_putstr((playerX+mapX-7)>>3,1,"I");
+		lcd_putdec(4,0,5,score);
+		lcd_putdec(13,0,3,time);
+
 		tma_flag=FALSE;
 	}
 }
 
 //これで合ってるかはわからないけれど・・・。まぁまぁかな
-unsigned int rand(){
+static unsigned int rand(){
 	static unsigned int next = 0x0001;
 	next = next * 17 + 91;
+}
+
+static KEY_DATA getKeyData(){
+	int ki = ~(PDRB);
+	KEY_DATA kd;
+	kd.U = ki & 0x80;
+	kd.D = ki & 0x40;
+	kd.L = ki & 0x20;
+	kd.R = ki & 0x10;
+	kd.C = ki & 0x08;
+	return kd;
+}
+
+static unsigned int generateMapColumn(int n){
+	unsigned int r = rand();
+	unsigned int ground, col;
+
+	//地面
+	if(GROUND(map[n - 2]) == 0x00){ //2つ前が穴なら
+		if((r & 7) < 1){ //[0:2]1/8の確率で高さ4
+			ground = 0x10;
+		}else if((r & 7) < 3){ //[0:2]2/8の確率で高さ3
+			ground = 0x20;
+		}else if((r & 7) < 6){ //[0:2]3/8の確率で高さ2
+			ground = 0x40;
+		}else{ //[0]2/8の確率で高さ1
+			ground = 0x80;
+		}
+	}else if(GROUND(map[n - 2]) == GROUND(map[n - 1])){ //平らなら
+		if((r & 7) != 0){ //[0:2]:7/8の確率で平ら
+			ground = GROUND(map[7]);
+		}else{ //[0:2]:1/8の確率で斜め
+			if(r & 8){ //[3]:1/2の確率で上がる
+				ground = GROUND(map[7]) >> 1;
+			}else{ //[3]:1/2の確率で下がる
+				ground = GROUND(map[7]) << 1;
+			}
+		}
+	}else if(GROUND(map[n - 2]) < GROUND(map[n - 1])){ //上りなら
+		if((r & 7) < 3){//[0:2]3/8の確率で上り
+			ground = GROUND(map[7]) >> 1;
+		}else((r & 7) < 5){//[0:2]2/8の確率で平ら
+			ground = GROUND(map[7]);
+		}else((r & 7) < 7){//[0:2]2/8の確率で下り
+			ground = GROUND(map[7]) << 1;
+		}else{//[0:2]1/8の確率で2つ下
+			ground = GROUND(map[7]) << 2;
+		}
+	}else{ //下りなら
+		if((r & 7) < 4){//[0:2]4/8の確率で平ら
+			ground = GROUND(map[7]);
+		}else((r & 7) < 6){//[0:2]2/8の確率で下り
+			ground = GROUND(map[7]) << 1;
+		}else{//[0:2]2/8の確率で上り
+			ground = GROUND(map[7]) >> 1;
+		}
+	}
+	ground = ground & 0xf8; //地面の高さは0から4
+	while(ground && (ground ^ 0x80)) ground |= ground << 1;
+	col |= ground | (ground << 8);
+
+	//アイテム
+	if((r & 0x38) < 0x18){//[4:5]3/8の確率でアイテムを生成する
+		col |= 0x0001 << (0 + ((r >> 6) & 3)); //[6]アイテムの高さは0から3
+	}
+
+	return col;
 }
 
 // time<0ならゲームオーバー、そうでなければクリア(score==highscoreならNEW RECORD!)
