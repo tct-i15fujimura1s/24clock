@@ -2,6 +2,8 @@
 #include "main.h"
 #include "mode10.h"
 
+char mode10_title[] = HK_TO HK_KE HK_I;
+
 TIME time = {0, 0, 0};
 
 volatile int cursor_position = 0;
