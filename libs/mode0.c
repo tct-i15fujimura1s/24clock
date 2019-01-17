@@ -1,3 +1,4 @@
+#define MODE0_C
 #include "libs.h"
 #include "main.h"
 
