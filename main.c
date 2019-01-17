@@ -138,11 +138,6 @@ void timer_init(void){
 
 /* User Interface のステートマシン (ここを作り込む)*/
 
-  ui_data.prev_mode=prev_mode;
-
-  return &ui_data;
-}
-
 int main(void){
   //UI_DATA* ui_data;
 	unsigned char sw=KEY_NONE;
