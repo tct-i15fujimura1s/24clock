@@ -1,6 +1,5 @@
 #include "libs.h"
 #include "main.h"
-#include "mode30.h"
 
 char mode30_title[] = HK_YA HK_SI HK_DAKUTEN HK_RU HK_SI;
 
