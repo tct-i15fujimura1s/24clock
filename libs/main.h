@@ -60,6 +60,7 @@ typedef struct _UI_DATA{
 #include "mode40.h"
 #include "mode50.h"
 #include "mode60.h"
+#include "mode70.h"
 
 #  ifdef MODE0_C
 char *tithe_mode_titles[] = {
@@ -69,7 +70,8 @@ char *tithe_mode_titles[] = {
   mode30_title,
   mode40_title,
   mode50_title,
-  mode60_title
+  mode60_title,
+  mode70_title
 };
 #  endif
 
@@ -80,32 +82,20 @@ UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良�
 
   ui_data.sw=(sw & 0x9f); /*念のために，b6,b5を0にしておく*/
   prev_mode=ui_data.mode;
-
+#    define DEF_MODE(n) case MODE_##n: do_mode##n(&ui_data); break;
   switch(ui_data.mode){
-  case MODE_0:
-    do_mode0(&ui_data);
-    break;
-  case MODE_10:
-    do_mode10(&ui_data);
-    break;
-  case MODE_11:
-    do_mode11(&ui_data);
-    break;
-  case MODE_20:
-    do_mode20(&ui_data);
-    break;
-  case MODE_30:
-    do_mode30(&ui_data);
-    break;
-  case MODE_40:
-    do_mode40(&ui_data);
-    break;
-  case MODE_50:
-    do_mode50(&ui_data);
-    break;
-  case MODE_60:
-    do_mode60(&ui_data);
-    break;
+  DEF_MODE(0)
+  DEF_MODE(10)
+  DEF_MODE(11)
+  DEF_MODE(20)
+  DEF_MODE(30)
+  DEF_MODE(40)
+  DEF_MODE(50)
+  DEF_MODE(60)
+  DEF_MODE(70)
+  DEF_MODE(71)
+  DEF_MODE(72)
+  DEF_MODE(73)
   default:
     break;
  }
