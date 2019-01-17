@@ -1,14 +1,6 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include "mode0.h"
-#include "mode10.h"
-#include "mode20.h"
-#include "mode30.h"
-#include "mode40.h"
-#include "mode50.h"
-#include "mode60.h"
-
 extern volatile int sec_flag;
 extern volatile int sec;
 extern volatile int tma_flag;
@@ -35,18 +27,6 @@ enum MENU_MODE{
   MODE_OUT_OF_MAX
 };
 
-#  ifdef MODE0_C
-char tithe_mode_titles[][7] = {
-  mode0_title,
-  mode10_title,
-  mode20_title,
-  mode30_title,
-  mode40_title,
-  mode50_title,
-  mode60_title
-};
-#  endif
-
 //うぅ。下記のKとkの見分け(大文字小文字の見分け)が付かずに，
 //１時間半の痛恨のロス(2011/12/19 00:37 by T.NITTA)
 enum SW_CODE{
@@ -68,6 +48,26 @@ typedef struct _UI_DATA{
   int prev_mode;
   unsigned char sw;
 }UI_DATA;
+
+#include "mode0.h"
+#include "mode10.h"
+#include "mode20.h"
+#include "mode30.h"
+#include "mode40.h"
+#include "mode50.h"
+#include "mode60.h"
+
+#  ifdef MODE0_C
+char tithe_mode_titles[][7] = {
+  mode0_title,
+  mode10_title,
+  mode20_title,
+  mode30_title,
+  mode40_title,
+  mode50_title,
+  mode60_title
+};
+#  endif
 
 #  ifdef MAIN_C
 UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良く考えて */
