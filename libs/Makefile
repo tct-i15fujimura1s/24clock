@@ -1,4 +1,5 @@
-CC = gccc
+CC = h8300-elf-gcc
+AR = h8300-elf-ar
 
 SRCS1=wait.s lcd.c util.c lcd_util.c matrix.c key.c timer.c ir.c speaker.c
 OBJS1=wait.o lcd.o util.o lcd_util.o matrix.o key.o timer.o ir.o speaker.o
@@ -17,15 +18,15 @@ CFLAGS= -O2 -Wall -mh -mn
 all:crt0.o libutil.a
 
 libutil.a:$(OBJS)
-	h8300-elf-ar r libutil.a $(OBJS)
+	$(AR) r libutil.a $(OBJS)
 	h8300-elf-ranlib libutil.a
 .c.o:
-	h8300-elf-gcc $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 .s.o:
-	h8300-elf-gcc $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 
 depend:$(SRCS)
-	($(LANGSET) h8300-elf-gcc -M $(CFLAGS) $(SRCS) > depend)
+	($(LANGSET) $(CC) -M $(CFLAGS) $(SRCS) > depend)
 
 clean:
 	rm -f *~ *.o lib*.a depend
