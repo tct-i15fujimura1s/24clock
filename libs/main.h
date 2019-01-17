@@ -48,6 +48,4 @@ typedef struct _UI_DATA{
   unsigned char sw;
 }UI_DATA;
 
-extern void mode_go(UI_DATA *ud, int mode);
-
 #endif
