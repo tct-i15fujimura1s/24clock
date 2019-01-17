@@ -1,12 +1,6 @@
+#define MAIN_C
 #include "libs.h"       /* 前のmy3664hの内容は，libs/libs.hへ統合した */
 #include "main.h"
-#include "mode0.h"
-#include "mode10.h"
-#include "mode20.h"
-#include "mode30.h"
-#include "mode40.h"
-#include "mode50.h"
-#include "mode60.h"
 
 volatile int tma_flag=FALSE;
 volatile int sec_flag=FALSE;
@@ -143,42 +137,6 @@ void timer_init(void){
 /* main() などの割り込みルーチン以外の処理は，トップハーフの処理*/
 
 /* User Interface のステートマシン (ここを作り込む)*/
-
-UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良く考えて */
-  static UI_DATA ui_data={MODE_0,MODE_0,};
-  int prev_mode;
-
-  ui_data.sw=(sw & 0x9f); /*念のために，b6,b5を0にしておく*/
-  prev_mode=ui_data.mode;
-
-  switch(ui_data.mode){
-  case MODE_0:
-    do_mode0(&ui_data);
-    break;
-  case MODE_10:
-    do_mode10(&ui_data);
-    break;
-  case MODE_11:
-    do_mode11(&ui_data);
-    break;
-  case MODE_20:
-    do_mode20(&ui_data);
-    break;
-  case MODE_30:
-    do_mode30(&ui_data);
-    break;
-  case MODE_40:
-    do_mode40(&ui_data);
-    break;
-  case MODE_50:
-    do_mode50(&ui_data);
-    break;
-  case MODE_60:
-    do_mode60(&ui_data);
-    break;
-  default:
-    break;
- }
 
   ui_data.prev_mode=prev_mode;
 
