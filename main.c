@@ -6,6 +6,7 @@
 #include "mode30.h"
 #include "mode40.h"
 #include "mode50.h"
+#include "mode60.h"
 
 volatile int tma_flag=FALSE;
 volatile int sec_flag=FALSE;
@@ -143,11 +144,6 @@ void timer_init(void){
 
 /* User Interface のステートマシン (ここを作り込む)*/
 
-void mode_go(UI_DATA *ud, int mode) {
-  ud->prev_mode = mode;
-  ud->mode = mode;
-}
-
 UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良く考えて */
   static UI_DATA ui_data={MODE_0,MODE_0,};
   int prev_mode;
@@ -177,6 +173,9 @@ UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良�
   case MODE_50:
     do_mode50(&ui_data);
     break;
+  case MODE_60:
+    do_mode60(&ui_data);
+    break;
   default:
     break;
  }
@@ -187,7 +186,7 @@ UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良�
 }
 
 int main(void){
-         UI_DATA* ui_data=NULL;
+  //UI_DATA* ui_data;
 	unsigned char sw=KEY_NONE;
 
 	//	char test[]="hoge";
@@ -221,7 +220,7 @@ int main(void){
 
 	    
 	    
-	    ui_data=ui(sw);           /* ユーザインタフェースの実行 */
+	    /*ui_data=*/ui(sw);           /* ユーザインタフェースの実行 */
 	    
 	    tma_flag=FALSE;
 	  }

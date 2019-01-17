@@ -2,9 +2,10 @@
 #include "main.h"
 #include "mode30.h"
 static unsigned int l=0,r=0,u=0,d=0;
+static const unsigned int pattern[8] = {0x0018, 0x003c, 0x007e, 0x00db, 0x0099, 0x0018, 0x0018, 0x0018};
 
 void do_mode30(UI_DATA* ud){
-  
+  int i;
   switch(ud->sw){  /*モード内でのキー入力別操作*/
   case KEY_LONG_C:  /* 中央キーの長押し */
     ud->mode=MODE_0; /* 次は，モード0に戻る */
@@ -12,50 +13,28 @@ void do_mode30(UI_DATA* ud){
     
   case KEY_SHORT_L:
     if(l==0){
-      matrix_led_pattern[0]=0x0018;
-      matrix_led_pattern[1]=0x003c;
-      matrix_led_pattern[2]=0x007e;
-      matrix_led_pattern[3]=0x00db;
-      matrix_led_pattern[4]=0x0099;
-      matrix_led_pattern[5]=0x0018;
-      matrix_led_pattern[6]=0x0018;
-      matrix_led_pattern[7]=0x0018;
-      l=1;
+      for(i = 0; i < 8; i++){
+	matrix_led_pattern[i] = pattern[i];
+      }
     }else{
-      matrix_led_pattern[0]=0x1800;
-      matrix_led_pattern[1]=0x3c00;
-      matrix_led_pattern[2]=0x7e00;
-      matrix_led_pattern[3]=0xdb00;
-      matrix_led_pattern[4]=0x9900;
-      matrix_led_pattern[5]=0x1800;
-      matrix_led_pattern[6]=0x1800;
-      matrix_led_pattern[7]=0x1800;
-      l=0;
+      for(i = 0; i < 8; i++){
+	matrix_led_pattern[i] = ((pattern[i] & 0xff) << 8) | (pattern[i] >> 8);
+      }
     }
+    l=!l;
     break;
     
   case KEY_SHORT_R:
     if(r==0){
-      matrix_led_pattern[0]=0x0018;
-      matrix_led_pattern[1]=0x0018;
-      matrix_led_pattern[2]=0x0018;
-      matrix_led_pattern[3]=0x0099;
-      matrix_led_pattern[4]=0x00db;
-      matrix_led_pattern[5]=0x007e;
-      matrix_led_pattern[6]=0x003c;
-      matrix_led_pattern[7]=0x0018;
-      r=1;
+      for(i = 0; i < 8; i++){
+	matrix_led_pattern[7 - i] = pattern[i];
+      }
     }else{
-      matrix_led_pattern[0]=0x1800;
-      matrix_led_pattern[1]=0x1800;
-      matrix_led_pattern[2]=0x1800;
-      matrix_led_pattern[3]=0x9900;
-      matrix_led_pattern[4]=0xdb00;
-      matrix_led_pattern[5]=0x7e00;
-      matrix_led_pattern[6]=0x3c00;
-      matrix_led_pattern[7]=0x1800;
-      r=0;
+      for(i = 0; i < 8; i++){
+	matrix_led_pattern[7 - i] = ((pattern[i] & 0xff) << 8) | (pattern[i] >> 8);
+      }
     }
+    r=!r;
     break;
     
   case KEY_SHORT_U:
