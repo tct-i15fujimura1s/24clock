@@ -55,7 +55,7 @@ void do_mode10(UI_DATA* ud){
   if(tma_flag==TRUE){
     lcd_clear();
     lcd_putstr(0,0,"MODE1:SET24CLOCK"); /*モード10の表示*/
-    lcd_putstr(10,1,"-->\xc4\xb9\xb2");
+    lcd_putstr(10,1,"-->" HK_TO HK_KE HK_I);
     /* 24時間時計の設定 */
     lcd_putstr(1,1,"  :  :");
     lcd_putudec(1,1,2,time.hours);
