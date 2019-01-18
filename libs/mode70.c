@@ -105,9 +105,12 @@ static unsigned int generateMapColumn();
 static KEY_DATA getKeyData();
 static unsigned int rand();
 
+#define RED(y) (0x0001 << (y))
+#define GREEN(y) (0x0100 << (y))
+#define ORANGE(y) (0x0101 << (y))
 #define GROUND(p) ((((p) & 0xff00) >> 8) & (p))
-#define IS_GROUND(x, y) (map[x] && (0x0101 << (y)))
-#define IS_ITEM(x, y) (map[x] && (0x0001 << (y)))
+#define IS_GROUND(x, y) (map[x] & ORANGE(y))
+#define IS_ITEM(x, y) (map[x] & GREEN(y) & ~RED(y))
 
 static int score = 0, time = 0;
 static unsigned int map[8];
@@ -126,8 +129,8 @@ void do_mode72(UI_DATA *ud){
 		time = 100;
 
 		//初期マップを生成
-		map[0] = 0x0303;
-		map[1] = 0x0303;
+		map[0] = ORANGE(6) |  ORANGE(7);
+		map[1] = ORANGE(6) | ORANGE(7);
 		for(i = 2; i < 8; i++) map[i] = generateMapColumn(i);
 	}
 
@@ -153,11 +156,11 @@ void do_mode72(UI_DATA *ud){
 			}
 		}
 		if(IS_ITEM(playerX, playerY)){//もし下半身がアイテムと重なっていたら
-			map[playerX] ^= 0x0001 << playerY;//アイテムを消す
+			map[playerX] ^= GREEN(playerY);//アイテムを消す
 			score += 1;
 		}
-		if(IS_ITEM(playerX, playerY+1)){
-			map[playerX] ^= 0x0001 << (playerY + 1);//アイテムを消す
+		if(IS_ITEM(playerX, playerY+1)){//もし上半身がアイテムと重なっていたら
+			map[playerX] ^= GREEN(playerY + 1);//アイテムを消す
 			score += 1;
 		}
 		if(key.R){//右へ
@@ -181,16 +184,16 @@ void do_mode72(UI_DATA *ud){
 			}
 		}
 		if(key.L){//左へ
-			if(playerX >= 0){//動ける
+			if(playerX > 0){//動ける
 				playerX--;
 			}
 		}
 
 		//描画など
 		for(i = 0; i < 8; i++) matrix_led_pattern[i] = map[i];
-		if(playerY >= 0){
-			matrix_led_pattern[playerX] |= 0x0100 << playerY; //下半身
-			if(playerY != 0) matrix_led_pattern[playerX] |= 0x0100 << (playerY -1); //上半身
+		if(playerY >= 0 && playerY < 8){
+			matrix_led_pattern[playerX] |= RED(playerY); //下半身
+			if(playerY != 0) matrix_led_pattern[playerX] |= RED(playerY -1); //上半身
 		}
 
 		lcd_putstr(0,1,"................");
@@ -264,8 +267,8 @@ static unsigned int generateMapColumn(int n){
 			ground = GROUND(map[7]) >> 1;
 		}
 	}
-	ground = ground & 0xf8; //地面の高さは0から4
-	while(ground && (ground ^ 0x80)) ground |= ground << 1;
+	ground &= 0xf8; //地面の高さは0から4
+	while(ground != 0x00 && (ground & 0x80) == 0) ground |= ground << 1;//地面のライン以下を埋める
 	col |= ground | (ground << 8);
 
 	//アイテム
