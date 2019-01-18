@@ -34,7 +34,7 @@ enum MENU_MODE{
 //うぅ。下記のKとkの見分け(大文字小文字の見分け)が付かずに，
 //１時間半の痛恨のロス(2011/12/19 00:37 by T.NITTA)
 enum SW_CODE{
-  KEY_NONE=0,         //キー入力無し 
+  KEY_NONE=0,         //キー入力無し
   KEY_SHORT_U=(1<<4), //上短押し
   KEY_SHORT_D=(1<<3), //下短押し
   KEY_SHORT_L=(1<<2), //左短押し
@@ -53,14 +53,29 @@ typedef struct _UI_DATA{
   unsigned char sw;
 }UI_DATA;
 
-#include "mode0.h"
-#include "mode10.h"
-#include "mode20.h"
-#include "mode30.h"
-#include "mode40.h"
-#include "mode50.h"
-#include "mode60.h"
-#include "mode70.h"
+#  include "mode0.h"
+#  include "mode10.h"
+#  include "mode20.h"
+#  include "mode30.h"
+#  include "mode40.h"
+#  include "mode50.h"
+#  include "mode60.h"
+#  include "mode70.h"
+
+#  define ON_KEY(ud) \
+  { \
+    const UI_DATA *_ud = (ud); \
+    switch(_ud){
+#  define WHEN_KEY(key) \
+      break; \
+    case KEY_##key
+#  define GO_MODE(n) \
+      (_ud->mode = MODE_##n)
+#  define END_ON \
+    default: \
+      break; \
+    } \
+  }
 
 #  ifdef MODE0_C
 char *tithe_mode_titles[] = {
@@ -99,7 +114,7 @@ UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良�
   default:
     break;
  }
-  
+
   ui_data.prev_mode=prev_mode;
 
   return &ui_data;
