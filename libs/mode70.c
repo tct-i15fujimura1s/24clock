@@ -14,7 +14,7 @@ void do_mode70(UI_DATA* ud){
   if(ud->prev_mode!=ud->mode){  /* 他のモード遷移した時に実行 */
     /*必要なら，何らかのモードの初期化処理*/
     lcd_clear();
-    lcd_putstr(1,0,"2" HK_TO HK_DAKUTEN HK_TU_SMALL HO_TO HK_HU HK_DAKUTEN HK_RA HK_SA HK_DAKUTEN HK_ONBIKI HK_SU HK_DAKUTEN); /*モード1の初期表示*/
+    lcd_putstr(1,0,"2" HK_TO HK_DAKUTEN HK_TU_SMALL HK_TO HK_HU HK_DAKUTEN HK_RA HK_SA HK_DAKUTEN HK_ONBIKI HK_SU HK_DAKUTEN); /*モード1の初期表示*/
     lcd_putstr(3,1,"> " HK_HA HK_SI HK_DAKUTEN HK_ME HK_RU " <  >>");
   }
 
@@ -86,7 +86,7 @@ void do_mode71(UI_DATA *ud){
  *     ゴールは赤い縦長の旗であらわされる。
  *     ゴールに触れるとクリアとなり、ハイスコアの更新処理をしてMODE_71に移行する。
  */
-static const unsigned int goalMap = {0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0xE080, 0xC080};
+static const unsigned int goalMap[] = {0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0xE080, 0xC080};
 
 typedef struct {
 	unsigned char U:1;
@@ -165,9 +165,9 @@ void do_mode72(UI_DATA *ud){
 				mapX++;
 				for(i = 0; i < 7; i++) map[i] = map[i + 1]; //ずらす
 				if(mapX < 120){//最後のマップ以外は
-					map[8] = generateMapColumn(8);
+					map[7] = generateMapColumn(7);
 				}else{//最後のマップは
-					map[8] = goalMap[mapX & 3];//専用のマップを使う
+					map[7] = goalMap[mapX & 3];//専用のマップを使う
 				}
 			}else if(playerX < 7){//動ける
 				playerX++;
@@ -206,22 +206,23 @@ void do_mode72(UI_DATA *ud){
 static unsigned int rand(){
 	static unsigned int next = 0x0001;
 	next = next * 17 + 91;
+	return next;
 }
 
 static KEY_DATA getKeyData(){
 	int ki = ~(PDRB);
 	KEY_DATA kd;
-	kd.U = ki & 0x80;
-	kd.D = ki & 0x40;
-	kd.L = ki & 0x20;
-	kd.R = ki & 0x10;
-	kd.C = ki & 0x08;
+	kd.U = ki & 0x80 ? 1 : 0;
+	kd.D = ki & 0x40 ? 1 : 0;
+	kd.L = ki & 0x20 ? 1 : 0;
+	kd.R = ki & 0x10 ? 1 : 0;
+	kd.C = ki & 0x08 ? 1 : 0;
 	return kd;
 }
 
 static unsigned int generateMapColumn(int n){
 	unsigned int r = rand();
-	unsigned int ground, col;
+	unsigned int ground, col = 0;
 
 	//地面
 	if(GROUND(map[n - 2]) == 0x00){ //2つ前が穴なら
@@ -247,9 +248,9 @@ static unsigned int generateMapColumn(int n){
 	}else if(GROUND(map[n - 2]) < GROUND(map[n - 1])){ //上りなら
 		if((r & 7) < 3){//[0:2]3/8の確率で上り
 			ground = GROUND(map[7]) >> 1;
-		}else((r & 7) < 5){//[0:2]2/8の確率で平ら
+		}else if((r & 7) < 5){//[0:2]2/8の確率で平ら
 			ground = GROUND(map[7]);
-		}else((r & 7) < 7){//[0:2]2/8の確率で下り
+		}else if((r & 7) < 7){//[0:2]2/8の確率で下り
 			ground = GROUND(map[7]) << 1;
 		}else{//[0:2]1/8の確率で2つ下
 			ground = GROUND(map[7]) << 2;
@@ -257,7 +258,7 @@ static unsigned int generateMapColumn(int n){
 	}else{ //下りなら
 		if((r & 7) < 4){//[0:2]4/8の確率で平ら
 			ground = GROUND(map[7]);
-		}else((r & 7) < 6){//[0:2]2/8の確率で下り
+		}else if((r & 7) < 6){//[0:2]2/8の確率で下り
 			ground = GROUND(map[7]) << 1;
 		}else{//[0:2]2/8の確率で上り
 			ground = GROUND(map[7]) >> 1;
