@@ -28,7 +28,7 @@ void do_mode70(UI_DATA* ud){
   	break;
 
   case KEY_SHORT_C:
-  	ud->mode=MODE_71; /*モード72に行く*/
+  	ud->mode=MODE_72; /*モード72に行く*/
     break;
 
   default:
@@ -71,7 +71,7 @@ void do_mode71(UI_DATA *ud){
  *     マップの次の列(mapX+1)が読み込まれ、マップが無かった(((mapX+1)&3)==0)場合は次を生成する。
  ** マップ
  *     マップはunsigned int[8]の配列に格納される。
- *     マップは1列毎に疑似乱数とマルコフ連鎖を用いて自動生成される。
+ *     マップは1列毎に疑似乱数を用いて自動生成される。
  *     また、全体マップは実際には存在しないが、あるとしたときのプレイヤーの現在の位置がLCDの2行目に表示される。
  *     絶対位置は(playerX+mapX-7)で計算される。プレイヤーを表す"I"が表示される位置はそれを>>3した位置となる。
  *     0から14番目までのマップは自動生成であるが、15番目のマップは決まっている。
@@ -86,7 +86,7 @@ void do_mode71(UI_DATA *ud){
  *     ゴールは赤い縦長の旗であらわされる。
  *     ゴールに触れるとクリアとなり、ハイスコアの更新処理をしてMODE_71に移行する。
  */
-static const unsigned int goalMap[] = {0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0xE080, 0xC080};
+static const unsigned int goalMap[] = {0x8080, 0x8080, 0xE080, 0xC080};
 
 typedef struct {
 	unsigned char U:1;
@@ -164,7 +164,7 @@ void do_mode72(UI_DATA *ud){
 			if(playerX > 4 && mapX < 127){//スクロール
 				mapX++;
 				for(i = 0; i < 7; i++) map[i] = map[i + 1]; //ずらす
-				if(mapX < 120){//最後のマップ以外は
+				if(mapX < 124){//最後のマップ以外は
 					map[7] = generateMapColumn(7);
 				}else{//最後のマップは
 					map[7] = goalMap[mapX & 3];//専用のマップを使う
