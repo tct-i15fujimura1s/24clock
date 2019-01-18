@@ -17,6 +17,7 @@
 #include "watchdog.h"
 #include "led.h"
 #include "time.h"
+#include "hankakukana.h"
 
 /* ここに書いていた宣言などは，           */
 /* ソースリストの依存関係を軽減するために */
