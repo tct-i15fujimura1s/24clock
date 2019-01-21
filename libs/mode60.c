@@ -180,12 +180,14 @@ static int flip(enum TURN turn, POS p, POS d){
       if(IS_RED(q)) break;
       if(!IS_GREEN(q)) return 0;
     }
+    if(!IS_WITHIN_RECT8(q)) return 0;
     for(i = 0, q = p, P_ADD(q, d); i < flipped; i++, P_ADD(q, d)) SET_RED(q);
   }else{
     for(q = p, P_ADD(q, d); IS_WITHIN_RECT8(q); flipped++, P_ADD(q, d)){
       if(IS_GREEN(q)) break;
       if(!IS_RED(q)) return 0;
     }
+    if(!IS_WITHIN_RECT8(q)) return 0;
     for(i = 0, q = p, P_ADD(q, d); i < flipped; i++, P_ADD(q, d)) SET_GREEN(q);
   }
   return flipped;
