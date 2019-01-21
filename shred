@@ -1,0 +1,67 @@
+#!/usr/bin/ruby
+
+require 'optparse'
+require 'securerandom'
+
+options = {
+  :n => 3
+}
+optionParser = OptionParser.new do |op|
+  op.on('-f', '--force') { options[:f] = true }
+  op.on('-n', '--iterations [N]', Integer) { |n| options[:n] = n }
+  op.on('--random-source [FILE]') { |s| options[:randomSource] = s }
+  op.on('-s', '--size [N]') { |n| options[:s] = n }
+  op.on('-u', '--remove') { options[:u] = true }
+  op.on('-v', '--verbose') { options[:v] = true }
+  op.on('-x', '--exact') { options[:x] = true }
+  op.on('-z', '--zero') { options[:z] = true }
+end
+
+op.parse! ARGV
+
+BLOCK_SIZE = 512
+
+randomSource = lambda do |n|
+  return SeureRandom.random_bytes n
+end
+
+ARGV.each do |filename|
+  next if File.exist? filename
+  filesize = File.size filename
+  unless options.key? :x and options[:x]
+    filesize = (filesize / BLOCK_SIZE.to_f).ceil * BLOCK_SIZE
+    File.truncate filename, filesize
+  end
+  File.open(filename, 'wb') do |file|
+    options[:n].times do
+      count = filesize
+      while count >= BLOCK_SIZE
+        file.syswrite randomSource[BLOCK_SIZE]
+        count -= BLOCK_SIZE
+      end
+      if count > 0
+        file.syswrite randomSource[count]
+        count = 0
+      end
+    end
+    if options.key? :z and options[:z]
+      zeroes = ''.rjust(BLOCK_SIZE, '00000000')
+      while count >= BLOCK_SIZE
+        file.syswrite zeroes
+        count -= BLOCK_SIZE
+      end
+      if count > 0
+        file.syswrite zeroes[0, count]
+        count = 0
+      end
+    end
+  end
+  if options.key? :u and options[:u]
+    currentFilename = filename
+    (1..filename.length).reverse_each do |n|
+      newFilename = SecureRandom.alphanumeric n
+      currentFilename = newFilename if File.rename currentFilename, newFilename
+    end
+    File.delete currentFilename
+  end
+end
