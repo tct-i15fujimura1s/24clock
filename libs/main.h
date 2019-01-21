@@ -24,6 +24,7 @@ enum MENU_MODE{
   MODE_40 = 40,
   MODE_50 = 50,
   MODE_60 = 60,
+  MODE_80 = 70,
   MODE_OUT_OF_MAX
 };
 
@@ -56,6 +57,7 @@ typedef struct _UI_DATA{
 #include "mode40.h"
 #include "mode50.h"
 #include "mode60.h"
+#include "mode80.h"
 
 #  ifdef MODE0_C
 char *tithe_mode_titles[] = {
@@ -65,7 +67,8 @@ char *tithe_mode_titles[] = {
   mode30_title,
   mode40_title,
   mode50_title,
-  mode60_title
+  mode60_title,
+  mode80_title
 };
 #  endif
 
@@ -101,6 +104,9 @@ UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良�
     break;
   case MODE_60:
     do_mode60(&ui_data);
+    break;
+  case MODE_80:
+    do_mode80(&ui_data);
     break;
   default:
     break;
