@@ -1,6 +1,9 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+#define USING_MODE_0
+#define USING_MODE_80
+
 extern volatile int sec_flag;
 extern volatile int sec;
 extern volatile int tma_flag;
@@ -81,33 +84,49 @@ UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良�
   prev_mode=ui_data.mode;
 
   switch(ui_data.mode){
+#    ifdef USING_MODE_0
   case MODE_0:
     do_mode0(&ui_data);
     break;
+#    endif
+#    ifdef USING_MODE_10
   case MODE_10:
     do_mode10(&ui_data);
     break;
   case MODE_11:
     do_mode11(&ui_data);
     break;
+#    endif
+#    ifdef USING_MODE_20
   case MODE_20:
     do_mode20(&ui_data);
     break;
+#    endif
+#    ifdef USING_MODE_30
   case MODE_30:
     do_mode30(&ui_data);
     break;
+#    endif
+#    ifdef USING_MODE_40
   case MODE_40:
     do_mode40(&ui_data);
     break;
   case MODE_50:
+#    endif
+#    ifdef USING_MODE_50
     do_mode50(&ui_data);
     break;
+#    endif
+#    ifdef USING_MODE_60
   case MODE_60:
     do_mode60(&ui_data);
     break;
+#    endif
+#    ifdef USING_MODE_80
   case MODE_80:
     do_mode80(&ui_data);
     break;
+#    endif
   default:
     break;
  }
