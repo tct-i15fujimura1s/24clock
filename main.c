@@ -167,19 +167,26 @@ UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良�
     break;
   case MODE_20:
     do_mode20(&ui_data);
+<<<<<<< HEAD
     break;
   case MODE_21:
     do_mode21(&ui_data);
     break;
+=======
+break;
+>>>>>>> 2ac5efdc8835ffa15100d38aff6875e34bfe69d9
   case MODE_30:
     do_mode30(&ui_data);
     break;
   case MODE_40:
     do_mode40(&ui_data);
     break;
+<<<<<<< HEAD
   case MODE_50:
     do_mode50(&ui_data);
     break;
+=======
+>>>>>>> 2ac5efdc8835ffa15100d38aff6875e34bfe69d9
   default:
     break;
  }
