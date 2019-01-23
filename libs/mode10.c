@@ -2,6 +2,8 @@
 #include "main.h"
 #include "mode10.h"
 
+char mode10_title[] = HK_TO HK_KE HK_I;
+
 TIME time = {0, 0, 0};
 
 volatile int cursor_position = 0;
@@ -63,7 +65,7 @@ void do_mode10(UI_DATA* ud){
     lcd_putudec(7,1,2,time.seconds);
     
     /* カーソルの表示 */
-    int value, real_cursor_position;
+    int real_cursor_position;
     char tempstr[2];
     real_cursor_position = cursor_position < 2
       ? cursor_position
@@ -82,7 +84,7 @@ void do_mode10(UI_DATA* ud){
     tma_flag=FALSE;
   }
   
-  if(sec_flag==TRUE){
+  //if(sec_flag==TRUE){
 
     /*コメント：ここでは，LCDの再描画処理を1秒ごとに行っている。        */
     /*これは，万が一，予期せぬノイズで，LCDの表示に誤動作が発生しても， */
@@ -90,8 +92,8 @@ void do_mode10(UI_DATA* ud){
     /*いくら工夫しても，防ぎようが無いノイズがあったりするのです…。    */
     /*不具合の発生確率は，「コストをある程度かければ」下げることが可能。*/
 
-    sec_flag=FALSE;
-  }
+  //  sec_flag=FALSE;
+  //}
 
 }
 
@@ -100,7 +102,6 @@ void do_mode11(UI_DATA *ud) {
   if(ud->prev_mode != ud->mode){
     lcd_clear(); /* LCDをクリア */
     lcd_putstr(0,0,"MODE1:24CLOCK");
-    //lcd_putstr(0,2,"\xbe\xaf\xc3\xb2<--");
   }
 
   switch(ud->sw){

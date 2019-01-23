@@ -5,7 +5,7 @@
 void time_add_seconds(TIME *time, int sec) {
   sec += time->seconds;
   if(sec < 0) {
-    time_add_minutes(time, sec / 60);
+    time_add_minutes(time, sec / 60 - 1);
     sec += 60;
   } else if(sec >= 60) {
     time_add_minutes(time, sec / 60);
@@ -17,7 +17,7 @@ void time_add_seconds(TIME *time, int sec) {
 void time_add_minutes(TIME *time, int min) {
   min += time->minutes;
   if(min < 0) {
-    time_add_hours(time, min / 60);
+    time_add_hours(time, min / 60 - 1);
     min += 60;
   } else if(min >= 60) {
     time_add_hours(time, min / 60);

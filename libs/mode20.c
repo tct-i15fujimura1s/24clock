@@ -2,6 +2,7 @@
 #include "main.h"
 #include "mode20.h"
 
+char mode20_title[] = HK_RA HK_ONBIKI HK_ME HK_N;
 
 static char* time_data_arr[12]={"3","4","5","6","7","8","9","10","15","30","60"};
 volatile int time_arr[12]={180,240,300,360,420,480,540,600,900,1800,3600};

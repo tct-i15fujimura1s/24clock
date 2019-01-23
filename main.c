@@ -1,11 +1,6 @@
+#define MAIN_C
 #include "libs.h"       /* 前のmy3664hの内容は，libs/libs.hへ統合した */
 #include "main.h"
-#include "mode0.h"
-#include "mode10.h"
-#include "mode20.h"
-#include "mode30.h"
-#include "mode40.h"
-#include "mode50.h"
 
 volatile int tma_flag=FALSE;
 volatile int sec_flag=FALSE;
@@ -143,54 +138,8 @@ void timer_init(void){
 
 /* User Interface のステートマシン (ここを作り込む)*/
 
-void mode_go(UI_DATA *ud, int mode) {
-  ud->prev_mode = mode;
-  ud->mode = mode;
-}
-
-UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良く考えて */
-  static UI_DATA ui_data={MODE_0,MODE_0,};
-  int prev_mode;
-
-  ui_data.sw=(sw & 0x9f); /*念のために，b6,b5を0にしておく*/
-  prev_mode=ui_data.mode;
-
-  switch(ui_data.mode){
-  case MODE_0:
-    do_mode0(&ui_data);
-    break;
-  case MODE_10:
-    do_mode10(&ui_data);
-    break;
-  case MODE_11:
-    do_mode11(&ui_data);
-    break;
-  case MODE_20:
-    do_mode20(&ui_data);
-    break;
-  case MODE_21:
-    do_mode21(&ui_data);
-    break;
-  case MODE_30:
-    do_mode30(&ui_data);
-    break;
-  case MODE_40:
-    do_mode40(&ui_data);
-    break;
-  case MODE_50:
-    do_mode50(&ui_data);
-    break;
-  default:
-    break;
- }
-
-  ui_data.prev_mode=prev_mode;
-
-  return &ui_data;
-}
-
 int main(void){
-         UI_DATA* ui_data=NULL;
+  //UI_DATA* ui_data;
 	unsigned char sw=KEY_NONE;
 
 	//	char test[]="hoge";
@@ -224,7 +173,7 @@ int main(void){
 
 	    
 	    
-	    ui_data=ui(sw);           /* ユーザインタフェースの実行 */
+	    /*ui_data=*/ui(sw);           /* ユーザインタフェースの実行 */
 	    
 	    tma_flag=FALSE;
 	  }

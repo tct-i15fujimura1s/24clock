@@ -2,6 +2,7 @@
 #include "main.h"
 #include "mode40.h"
 
+char mode40_title[] = HK_O HK_E HK_KA HK_KI;
 static unsigned int pattern[8];
 static unsigned int x=0,y=0;
 

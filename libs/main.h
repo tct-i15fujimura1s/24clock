@@ -1,5 +1,6 @@
 #ifndef MAIN_H
 #define MAIN_H
+
 extern volatile int sec_flag;
 extern volatile int sec;
 extern volatile int tma_flag;
@@ -23,6 +24,7 @@ enum MENU_MODE{
   MODE_30 = 30,
   MODE_40 = 40,
   MODE_50 = 50,
+  MODE_60 = 60,
   MODE_OUT_OF_MAX
 };
 
@@ -48,6 +50,67 @@ typedef struct _UI_DATA{
   unsigned char sw;
 }UI_DATA;
 
-extern void mode_go(UI_DATA *ud, int mode);
+#include "mode0.h"
+#include "mode10.h"
+#include "mode20.h"
+#include "mode30.h"
+#include "mode40.h"
+#include "mode50.h"
+#include "mode60.h"
+
+#  ifdef MODE0_C
+char *tithe_mode_titles[] = {
+  mode0_title,
+  mode10_title,
+  mode20_title,
+  mode30_title,
+  mode40_title,
+  mode50_title,
+  mode60_title
+};
+#  endif
+
+#  ifdef MAIN_C
+UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良く考えて */
+  static UI_DATA ui_data={MODE_0,MODE_0,};
+  int prev_mode;
+
+  ui_data.sw=(sw & 0x9f); /*念のために，b6,b5を0にしておく*/
+  prev_mode=ui_data.mode;
+
+  switch(ui_data.mode){
+  case MODE_0:
+    do_mode0(&ui_data);
+    break;
+  case MODE_10:
+    do_mode10(&ui_data);
+    break;
+  case MODE_11:
+    do_mode11(&ui_data);
+    break;
+  case MODE_20:
+    do_mode20(&ui_data);
+    break;
+  case MODE_30:
+    do_mode30(&ui_data);
+    break;
+  case MODE_40:
+    do_mode40(&ui_data);
+    break;
+  case MODE_50:
+    do_mode50(&ui_data);
+    break;
+  case MODE_60:
+    do_mode60(&ui_data);
+    break;
+  default:
+    break;
+ }
+  
+  ui_data.prev_mode=prev_mode;
+
+  return &ui_data;
+}
+#  endif
 
 #endif

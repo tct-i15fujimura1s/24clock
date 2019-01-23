@@ -1,6 +1,9 @@
 #include "libs.h"
 #include "main.h"
 #include "mode50.h"
+
+char mode50_title[] = HK_HI HK_HANDAKUTEN HK_A HK_NO;
+
 void do_mode50(UI_DATA* ud){
   static int tempo=120;
   static int sound=1;
