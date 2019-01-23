@@ -3,9 +3,9 @@
 #include "mode20.h"
 
 
-static char time_data_arr[7]={'3','4','5','6','7','8','9'};
-volatile int time_arr[7]={180,240,300,360,420,480,540};
-static char temp[2] = {0,0};
+static char* time_data_arr[12]={"3","4","5","6","7","8","9","10","15","30","60"};
+volatile int time_arr[12]={180,240,300,360,420,480,540,600,900,1800,3600};
+//static char temp[2] = {0,0};
 static int i = 0;
 static int j = 1;
 volatile int waittime = 0;
@@ -16,12 +16,12 @@ void do_mode20(UI_DATA* ud){
 
 lcd_clear();
 lcd_putstr(0,0,"->");
-   temp[0] = time_data_arr[i];
-lcd_putstr(2,0,temp);
-lcd_putstr(3,0,"mintimer");
-   temp[0] = time_data_arr[j];
-lcd_putstr(2,1,temp);
-lcd_putstr(3,1,"mintimer");
+//temp[0] = time_data_arr[i];
+lcd_putstr(2,0,time_data_arr[i]);
+lcd_putstr(4,0,"mintimer");
+//temp[0] = time_data_arr[j];
+lcd_putstr(2,1,time_data_arr[j]);
+lcd_putstr(4,1,"mintimer");
 
 
  switch(ud->sw){
@@ -29,10 +29,10 @@ lcd_putstr(3,1,"mintimer");
  case KEY_SHORT_U:
    i=i+1;
    j=j+1;
-   if(i>6){
+   if(i>10){
      i=0;
    }
-   if(j>6){
+   if(j>10){
      j=0;
    }
    break;
@@ -41,10 +41,10 @@ lcd_putstr(3,1,"mintimer");
    i=i-1;
    j=j-1;
    if(i<0){
-     i=6;
+     i=10;
    }
    if(j<0){
-     j=6;
+     j=10;
    }
    break;
    
@@ -69,12 +69,12 @@ lcd_putstr(3,1,"mintimer");
 	
 void do_mode21(UI_DATA* ud){
   tempo_compare = 3735 / tempo; /* 1000/(tempo * 16 / 60) を展開 */
-  temp[0]=time_data_arr[i];
+  //temp[0]=time_data_arr[i];
   lcd_clear();
-  lcd_putstr(0,0,temp);
-  lcd_putstr(1,0,"mintimer");
-  lcd_putudec(0,1,3,waittime);
-  lcd_putstr(3,1,"secwait...");
+  lcd_putstr(0,0,time_data_arr[i]);
+  lcd_putstr(2,0,"mintimer");
+  lcd_putudec(0,1,4,waittime);
+  lcd_putstr(4,1,"secwait...");
 
 
   if(sec_flag==TRUE) {
