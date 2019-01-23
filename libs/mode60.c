@@ -132,7 +132,7 @@ void do_mode60(UI_DATA *ui_data){
 static void refresh(){
   lcd_clear();
   lcd_putstr(0,0,"MODE6:" HK_O HK_SE HK_RO); // 「オセロ」
-  if(show_pointer)lcd_putstr(15,0,IS_RED(pointer)?IS_GREEN(pointer)?"B":"R":IS_GREEN(pointer)?"G":" ");//debug: both/red/green/none
+  if(show_pointer)lcd_putstr(14,0,IS_RED(pointer)?IS_GREEN(pointer)?"RG":"R ":IS_GREEN(pointer)?" G":"  ");//debug: both/red/green/none
   if(current_turn == TURN_RED){
     lcd_putstr(0,1,"   " S_UTU "    " S_PASU); // 「ウツ」「パス」
     if(show_pointer){
@@ -214,7 +214,7 @@ static void com_routine(){
     candidate.openness = 0;
     candidate.flips = 0;
   }
-  if(cycle < 8){//ちょっと長いんだよね・・・もっと分割していい？
+  if(cycle < 8){//目に見える速度で思考する
     p.x = cycle;
     for(p.y = 0; p.y < 8; p.y++) if(IS_GREEN(p)) for(i = 8; i != 0; i--) {
 	  d.x = (i%3+1)%3-1;
