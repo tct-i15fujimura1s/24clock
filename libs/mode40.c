@@ -24,8 +24,10 @@ void do_mode40(UI_DATA* ud){
     /*モード4は，真中ボタンが押されたら，MODE0に戻る*/
   switch(ud->sw){    /*モード内でのキー入力別操作*/
   case KEY_LONG_C:/* 中央キーの長押し */
-    for(i = 0; i < 8; i++)
+    for(i = 0; i < 8; i++){
       matrix_led_pattern[i] = 0x0000;
+      pattern[i] = 0x0000;
+    }
     ud->mode=MODE_0; /* 次は，モード0に戻る */
     break;
   case KEY_SHORT_L:
