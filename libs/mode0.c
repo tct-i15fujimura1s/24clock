@@ -22,6 +22,15 @@ void do_mode0(UI_DATA* ud){
     DISABLE_LED_RED();
     DISABLE_LED_GREEN();
     DISABLE_LED_BLUE();
+    /*ロゴを表示*/
+    matrix_led_pattern[0] = 0x0FF8;
+    matrix_led_pattern[1] = 0x0840;
+    matrix_led_pattern[2] = 0x0820;
+    matrix_led_pattern[3] = 0x0740;
+    matrix_led_pattern[4] = 0x70F8;
+    matrix_led_pattern[5] = 0xA806;
+    matrix_led_pattern[6] = 0xA801;
+    matrix_led_pattern[7] = 0x6007;
   }
 
   if(tma_flag==TRUE){
