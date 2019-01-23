@@ -11,7 +11,7 @@ void do_mode40(UI_DATA* ud){
    if(ud->prev_mode!=ud->mode){  /* 他のモード遷移した時に実行 */
     /*必要なら，何らかのモードの初期化処理*/
     lcd_clear();
-    lcd_putstr(0,0,"MODE4:OEKAKI");
+    lcd_putstr(0,0,"MODE4:" HK_O HK_E HK_KA HK_KI);
    }
    
    if(tma_flag == TRUE){
