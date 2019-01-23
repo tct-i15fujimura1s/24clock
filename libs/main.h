@@ -4,7 +4,7 @@ extern volatile int sec_flag;
 extern volatile int sec;
 extern volatile int tma_flag;
 extern volatile int tmv_flag;
-extern unsigned int matrix_led_pattern[8]
+extern unsigned int matrix_led_pattern[8];
 extern volatile int tempo_flag;
 extern int tempo_compare;
 
