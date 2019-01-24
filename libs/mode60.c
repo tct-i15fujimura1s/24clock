@@ -237,7 +237,7 @@ static void com_routine(){
 	      break;
 	    }
 	  }
-	  if(flips == 0) continue;//残念、1つも取れなかった。次
+	  if(flips == 0 || !IS_WITHIN_RECT8(q)) continue;//残念、1つも取れなかった。次
 	  //どうやら何かしら取れたらしい
 	  if(candidate.openness < openness || (candidate.openness == openness && candidate.flips < flips)){
 	    cp = q;
