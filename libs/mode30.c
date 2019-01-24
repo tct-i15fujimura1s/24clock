@@ -3,7 +3,6 @@
 
 char mode30_title[] = HK_YA HK_SI HK_DAKUTEN HK_RU HK_SI;
 
-static unsigned int matrix_led_pattern[8];
 static unsigned int l=0,u=0,c=0,i;
 static unsigned int matrix_pattern[10][8]={
   {0x1800,0x3c00,0x7e00,0xdb00,0x9900,0x1800,0x1800,0x1800},
@@ -144,7 +143,7 @@ void do_mode30(UI_DATA* ud){
     /* 他のモード遷移した時に実行 もしくは，1秒ごとに表示*/
     /*必要なら，何らかのモードの初期化処理*/
     lcd_clear();  //0123456789ABCDEF
-    lcd_putstr(4,0,"ﾐﾁｦﾐﾂｹﾃﾈ"); /*モード2の初期表示*/
+    lcd_putstr(4,0,HK_MI HK_TI HK_WO HK_MI HK_TU HK_TE HK_NE); /*モード2の初期表示*/
     //show_sec();
     sec_flag=FALSE;
   }
