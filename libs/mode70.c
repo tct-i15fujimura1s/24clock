@@ -65,9 +65,9 @@ void do_mode70(UI_DATA *ud){
 		cycle = 0;
 		
 		lcd_clear();
-		matrix_led_clear();
+		for(i = 0; i < 8; i++) matrix_led_pattern[i] = matrix[i] = 0x0000;
 		lcd_putstr(0, 0, "MODE7:" HK_TE HK_TO HK_RI HK_SU);
-		lcd_putstr(0, 1, HK_SU HK_KO HK_A ":00000 " HK_TU HK_GI ":");
+		lcd_putstr(0, 1, HK_SU HK_KO HK_A ":00000 " HK_TU HK_KI HK_DAKUTEN ":");
 		lcd_putstr(13, 1, tetrimino_names[next]);
 	}
 	
@@ -75,15 +75,15 @@ void do_mode70(UI_DATA *ud){
 		switch(ud->sw){
 		case KEY_SHORT_L:
 			pos.x--;
-			if(is_laying(pos, &mino)) pos.x++;
+			if(is_laying(&mino, pos)) pos.x++;
 			break;
 		case KEY_SHORT_R:
 			pos.x++;
-			if(is_laying(pos, &mino)) pos.x--;
+			if(is_laying(&mino, pos)) pos.x--;
 			break;
 		case KEY_SHORT_C:
 			rotateR(&mino);
-			if(is_laying(pos, &mino)) rotateL(&mino);
+			if(is_laying(&mino, pos)) rotateL(&mino);
 			break;
 		case KEY_LONG_C:
 			ud->mode = MODE_0;
@@ -96,15 +96,15 @@ void do_mode70(UI_DATA *ud){
 			if(color == BLACK){
 				pos.x = 3;
 				pos.y = 0;
-				mino = tetoriminoes[next];
+				mino = tetriminoes[next];
 				color = colors[rand() % 3];
 				next = rand() % 7;
 				lcd_putstr(13, 1, tetrimino_names[next]);
 			}else{
 				pos.y++;
-				if(is_laying(pos, &mino)){
+				if(is_laying(&mino, pos)){
 					pos.y--;
-					paint_onto(mino, pos, color, matrix);
+					paint_onto(&mino, pos, color, matrix);
 					color = BLACK;
 				}
 			}
@@ -113,7 +113,7 @@ void do_mode70(UI_DATA *ud){
 		
 		for(i = 0; i < 8; i++) matrix_led_pattern[i] = matrix[i];
 		if(color != BLACK){
-			paint_onto(mino, pos, color, matrix_led_pattern);
+			paint_onto(&mino, pos, color, matrix_led_pattern);
 		}
 		
 		tma_flag = FALSE;
@@ -143,18 +143,18 @@ static void rotateL(TETRIMINO *t){
 }
 
 static int is_laying(TETRIMINO *t, POS p){
-	return (matrix[t.p1.x + p.x] & (ORANGE << (t.p1.y + p.y))) ||
-		(matrix[t.p2.x + p.x] & (ORANGE << (t.p2.y + p.y))) ||
-		(matrix[t.p3.x + p.x] & (ORANGE << (t.p3.y + p.y))) ||
-		(matrix[t.p4.x + p.x] & (ORANGE << (t.p4.y + p.y)));
+	return (matrix[t->p1.x + p.x] & (ORANGE << (t->p1.y + p.y))) ||
+		(matrix[t->p2.x + p.x] & (ORANGE << (t->p2.y + p.y))) ||
+		(matrix[t->p3.x + p.x] & (ORANGE << (t->p3.y + p.y))) ||
+		(matrix[t->p4.x + p.x] & (ORANGE << (t->p4.y + p.y)));
 }
 
 static void paint_onto(TETRIMINO *t, POS p, COLOR c, unsigned int *m){
 	int i;
-	m[t.p1.x + p.x] |= c << t.p1.y + p.y;
-	m[t.p2.x + p.x] |= c << t.p2.y + p.y;
-	m[t.p3.x + p.x] |= c << t.p3.y + p.y;
-	m[t.p4.x + p.x] |= c << t.p4.y + p.y;
+	m[t->p1.x + p.x] |= c << t->p1.y + p.y;
+	m[t->p2.x + p.x] |= c << t->p2.y + p.y;
+	m[t->p3.x + p.x] |= c << t->p3.y + p.y;
+	m[t->p4.x + p.x] |= c << t->p4.y + p.y;
 }
 
 static unsigned int rand(){
