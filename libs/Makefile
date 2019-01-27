@@ -6,8 +6,8 @@ OBJS1=wait.o lcd.o util.o lcd_util.o matrix.o key.o timer.o ir.o speaker.o
 SRCS2=serial.c ADconv.c eeprom.c watchdog.c led.c
 OBJS2=serial.o ADconv.o eeprom.o watchdog.o led.o
 
-SRCS3=time.c mode0.c mode10.c mode20.c mode30.c mode40.c mode50.c mode60.c
-OBJS3=time.o mode0.o mode10.o mode20.o mode30.o mode40.o mode50.o mode60.o
+SRCS3=time.c mode0.c mode10.c mode20.c mode30.c mode40.c mode50.c mode60.c mode70.c
+OBJS3=time.o mode0.o mode10.o mode20.o mode30.o mode40.o mode50.o mode60.o mode70.o
 
 SRCS=$(SRCS1) $(SRCS2) $(SRCS3)
 OBJS=$(OBJS1) $(OBJS2) $(OBJS3)
@@ -30,10 +30,10 @@ depend:$(SRCS)
 clean:
 	rm -f *~ *.o lib*.a depend
 
-#¼êÆ°¤Ç¡¤°Ê²¼¤Ëdepend¥Õ¥¡¥¤¥ë¤òÁŞÆş¤·¤¿
-#¥¯¥í¥¹¥³¥ó¥Ñ¥¤¥ë¤Ç¤Ê¤±¤ì¤Ğ¡¤makedepend¥³¥Ş¥ó¥É¤¬
-#bsd make¤«gnu make¤«¤¬Ê¬¤«¤Ã¤Æ¤¤¤ì¤Ğ¡¤.include¤«include¤¬
-#»È¤¨¤ë¤Î¤À¤±¤É¤Ê¤¡
+#æ‰‹å‹•ã§ï¼Œä»¥ä¸‹ã«dependãƒ•ã‚¡ã‚¤ãƒ«ã‚’æŒ¿å…¥ã—ãŸ
+#ã‚¯ãƒ­ã‚¹ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«ã§ãªã‘ã‚Œã°ï¼Œmakedependã‚³ãƒãƒ³ãƒ‰ãŒ
+#bsd makeã‹gnu makeã‹ãŒåˆ†ã‹ã£ã¦ã„ã‚Œã°ï¼Œ.includeã‹includeãŒ
+#ä½¿ãˆã‚‹ã®ã ã‘ã©ãªã
 
 lcd.o: lcd.c 3664.h wait.h libsCore.h
 util.o: util.c 3664.h libsCore.h matrix.h lcd.h
@@ -56,3 +56,4 @@ mode30.o: mode30.c mode30.h libs.h main.h
 mode40.o: mode40.c mode40.h libs.h main.h
 mode50.o: mode50.c mode50.h libs.h main.h
 mode60.o: mode60.c mode60.h libs.h main.h
+mode70.o: mode70.c mode70.h libs.h main.h
