@@ -1,6 +1,8 @@
 #include "libs.h"
 #include "main.h"
 
+char mode70_title[] = HK_TE HK_TO HK_RI HK_SU;
+
 typedef struct {
 	char x;
 	char y;
@@ -29,7 +31,7 @@ static void paint_onto(TETRIMINO *, POS, COLOR, unsigned int *);
 
 /* static定数 */
 static const COLOR colors[] = {RED, GREEN, ORANGE};
-static const char *tetrimino_names[] = {"I", "J", "L", "O", "S", "Z", "T"};
+static char *tetrimino_names[] = {"I", "J", "L", "O", "S", "Z", "T"};
 static const TETRIMINO tetriminoes[] = {
 	{{-1, 0}, {0, 0}, {1, 0}, {2, 0}},
 	{{-2, 0}, {-1, 0}, {0, 0}, {0, 1}},
@@ -93,21 +95,26 @@ void do_mode70(UI_DATA *ud){
 	
 	if(tma_flag == TRUE){
 		if(cycle == 0){
-			if(color == BLACK){
-				pos.x = 3;
-				pos.y = 0;
-				mino = tetriminoes[next];
-				color = colors[rand() % 3];
-				next = rand() % 7;
-				lcd_putstr(13, 1, tetrimino_names[next]);
-			}else{
-				pos.y++;
-				if(is_laying(&mino, pos)){
-					pos.y--;
-					paint_onto(&mino, pos, color, matrix);
-					color = BLACK;
-				}
-			}
+		  if(color == BLACK){ /* テトリミノがない */
+		    pos.x = 3;
+		    pos.y = 0;
+		    mino = tetriminoes[next];
+		    color = colors[rand() % 3];
+		    next = rand() % 7;
+		    lcd_putstr(13, 1, tetrimino_names[next]);
+		  }else{ /* テトリミノがある */
+		    pos.y++;
+		    if(is_laying(&mino, pos)){
+		      pos.y--;
+		      paint_onto(&mino, pos, color, matrix);
+		      color = BLACK;
+
+		      /* 行を消す処理を入れる */
+		      for(i = 7; i >= 0; i--){
+			/* もしその行が消せるなら？ */
+		      }
+		    }
+		  }
 		}
 		cycle = (cycle + 1) % (difficulty_max - difficulty);
 		
@@ -142,24 +149,36 @@ static void rotateL(TETRIMINO *t){
 	t->p4 = rotL(t->p4);
 }
 
+#define within(x, a, b) ((x) >= a && (x) <= b)
+
+static inline int within_screen(TETRIMINO *t, POS p){
+  //FIXME
+  return
+    within(t->p1.x + p.x, 0, 7) && within(t->p1.y + p.y, -2, 7) &&
+    within(t->p2.x + p.x, 0, 7) && within(t->p2.y + p.y, -2, 7) &&
+    within(t->p3.x + p.x, 0, 7) && within(t->p3.y + p.y, -2, 7) &&
+    within(t->p4.x + p.x, 0, 7) && within(t->p4.y + p.y, -2, 7);
+}
+
 static int is_laying(TETRIMINO *t, POS p){
-	return (matrix[t->p1.x + p.x] & (ORANGE << (t->p1.y + p.y))) ||
-		(matrix[t->p2.x + p.x] & (ORANGE << (t->p2.y + p.y))) ||
-		(matrix[t->p3.x + p.x] & (ORANGE << (t->p3.y + p.y))) ||
-		(matrix[t->p4.x + p.x] & (ORANGE << (t->p4.y + p.y)));
+  return !within_screen(t, p) ||
+    (matrix[t->p1.x + p.x] & (ORANGE << (t->p1.y + p.y))) ||
+    (matrix[t->p2.x + p.x] & (ORANGE << (t->p2.y + p.y))) ||
+    (matrix[t->p3.x + p.x] & (ORANGE << (t->p3.y + p.y))) ||
+    (matrix[t->p4.x + p.x] & (ORANGE << (t->p4.y + p.y)));
 }
 
 static void paint_onto(TETRIMINO *t, POS p, COLOR c, unsigned int *m){
-	int i;
-	m[t->p1.x + p.x] |= c << t->p1.y + p.y;
-	m[t->p2.x + p.x] |= c << t->p2.y + p.y;
-	m[t->p3.x + p.x] |= c << t->p3.y + p.y;
-	m[t->p4.x + p.x] |= c << t->p4.y + p.y;
+  int i;
+  m[t->p1.x + p.x] |= c << (t->p1.y + p.y);
+  m[t->p2.x + p.x] |= c << (t->p2.y + p.y);
+  m[t->p3.x + p.x] |= c << (t->p3.y + p.y);
+  m[t->p4.x + p.x] |= c << (t->p4.y + p.y);
 }
 
 static unsigned int rand(){
 	static unsigned int curr = 0x1234;
 	unsigned int next = curr * 17 + 91;
-	curr ^= (next >> 2) | (next + curr << 2 & 0xc000);
+	curr ^= (next >> 2) | ((next + curr) << 2 & 0xc000);
 	return next;
 }
