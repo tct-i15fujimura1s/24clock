@@ -243,6 +243,8 @@ static void com_routine(){
 	  }
 	  if(flips == 0 || !IS_WITHIN_RECT8(q)) continue;//残念、1つも取れなかった。次
 	  //どうやら何かしら取れたらしい
+	  openness += rand() & 1;
+	  flips += rand() & 1;
 	  if(candidate.openness < openness || (candidate.openness == openness && candidate.flips < flips)){
 	    cp = q;
 	    candidate.openness = openness;
