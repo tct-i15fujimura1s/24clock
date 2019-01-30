@@ -30,10 +30,10 @@ lcd_putstr(4,1,"mintimer");
  case KEY_SHORT_U:
    i=i+1;
    j=j+1;
-   if(i>=sizeof(time_data_arr)){
+   if(i>=sizeof(time_data_arr)-1){
      i=0;
    }
-   if(j>=sizeof(time_data_arr)){
+   if(j>=sizeof(time_data_arr)-1){
      j=0;
    }
    break;
