@@ -81,7 +81,7 @@ void do_mode21(UI_DATA* ud){
   if(sec_flag==TRUE) {
     waittime -= 1;
     if(waittime==0){
-      snd_play("C C C ");
+      snd_play("^E ^E ^E ");
       lcd_cursor(FALSE);
       lcd_blink(FALSE);
       ud->mode=MODE_0; /* メニューに移動 */
