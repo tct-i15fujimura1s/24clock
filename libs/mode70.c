@@ -70,7 +70,7 @@ void do_mode70(UI_DATA *ud){
 		for(i = 0; i < 8; i++) matrix_led_pattern[i] = matrix[i] = 0x0000;
 		lcd_putstr(0, 0, "MODE7:" HK_TE HK_TO HK_RI HK_SU);
 		lcd_putstr(0, 1, HK_SU HK_KO HK_A ":00000 " HK_TU HK_KI HK_DAKUTEN ":");
-		lcd_putstr(13, 1, tetrimino_names[next]);
+		lcd_putstr(14, 1, tetrimino_names[next]);
 	}
 	
 	if(tmv_flag == TRUE){
@@ -101,9 +101,10 @@ void do_mode70(UI_DATA *ud){
 		    mino = tetriminoes[next];
 		    color = colors[rand() % 3];
 		    next = rand() % 7;
-		    lcd_putstr(13, 1, tetrimino_names[next]);
+		    lcd_putstr(14, 1, tetrimino_names[next]);
 		  }else{ /* テトリミノがある */
 		    pos.y++;
+		    lcd_putdec(14,0,1,is_laying(&mino, pos));//debug
 		    if(is_laying(&mino, pos)){
 		      pos.y--;
 		      paint_onto(&mino, pos, color, matrix);
@@ -153,11 +154,11 @@ static void rotateL(TETRIMINO *t){
 
 static inline int within_screen(TETRIMINO *t, POS p){
   //FIXME
-  return
+  return (
     within(t->p1.x + p.x, 0, 7) && within(t->p1.y + p.y, -2, 7) &&
     within(t->p2.x + p.x, 0, 7) && within(t->p2.y + p.y, -2, 7) &&
     within(t->p3.x + p.x, 0, 7) && within(t->p3.y + p.y, -2, 7) &&
-    within(t->p4.x + p.x, 0, 7) && within(t->p4.y + p.y, -2, 7);
+    within(t->p4.x + p.x, 0, 7) && within(t->p4.y + p.y, -2, 7)) << 1;
 }
 
 static int is_laying(TETRIMINO *t, POS p){
