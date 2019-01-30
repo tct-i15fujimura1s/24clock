@@ -4,7 +4,7 @@
 
 char mode20_title[] = HK_TA HK_I HK_MA HK_ONBIKI;
 
-static char* time_data_arr[]={"1","2"."3","4","5","6","7","8","9","10","15","30","60"};
+static char* time_data_arr[]={"1","2","3","4","5","6","7","8","9","10","15","30","60"};
 volatile int time_arr[]={60,120,180,240,300,360,420,480,540,600,900,1800,3600};
 //static char temp[2] = {0,0};
 static int i = 0;
