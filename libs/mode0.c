@@ -27,10 +27,10 @@ void do_mode0(UI_DATA* ud){
     matrix_led_pattern[1] = 0x0210;
     matrix_led_pattern[2] = 0x0410;
     matrix_led_pattern[3] = 0x02E0;
-    matrix_led_pattern[4] = 0x1F0E;
-    matrix_led_pattern[5] = 0x6015;
+    matrix_led_pattern[4] = 0x7F0E;
+    matrix_led_pattern[5] = 0x8015;
     matrix_led_pattern[6] = 0x8015;
-    matrix_led_pattern[7] = 0xE006;
+    matrix_led_pattern[7] = 0xF006;
   }
 
   if(tma_flag==TRUE){
