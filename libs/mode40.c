@@ -45,8 +45,10 @@ void do_mode40(UI_DATA* ud){
     break;
   case KEY_SHORT_C:
     col = pattern[x];
+#ifdef DEBUG
     lcd_putdec(0,1,5,col);
-    if(col & (0x0001<<y)){//もし赤なら
+#endif
+      if(col & (0x0001<<y)){//もし赤なら
       col &= ~(0x0001<<y);//赤を消す
       col |= (0x0100<<y);//緑をつける
     }
