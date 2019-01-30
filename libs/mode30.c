@@ -1,7 +1,7 @@
 #include "libs.h"
 #include "main.h"
 
-char mode30_title[] = HK_YA HK_SI HK_DAKUTEN HK_RU HK_SI;
+char mode30_title[] = HK_ME HK_I HK_RO; /* メイロ */
 
 static unsigned int l=0,u=0,c=0,i;
 static unsigned int matrix_pattern[10][8]={
