@@ -63,12 +63,14 @@ void do_mode60(UI_DATA *ui_data){
   }
   
   switch(ui_data->sw){
-  case KEY_LONG_R: 	//DEBUG
+#ifdef DEBUG
+	  case KEY_LONG_R: 	//DEBUG
     set(TURN_RED, pointer);
     break;
   case KEY_LONG_L: 	//DEBUG
     set(TURN_GREEN, pointer);
     break;
+#endif
   case KEY_SHORT_U:
     pointer.y = (pointer.y + 7) & 7;
     break;
@@ -247,12 +249,14 @@ static void com_routine(){
 	  }
 	  
 	  //debug
+#ifdef DEBUG
 	  lcd_putstr(0,1,S_16);
 #define S_KONPYU_TA_KOUHO "COM " HK_KO HK_U HK_HO
 	  lcd_putstr(0,1,S_KONPYU_TA_KOUHO ":( , )");
 	  lcd_putudec(sizeof(S_KONPYU_TA_KOUHO ":"),1,1,cp.x);
 	  lcd_putudec(sizeof(S_KONPYU_TA_KOUHO ":( "),1,1,cp.y);
-	  wait_frames = 20;
+#endif
+	    wait_frames = 20;
 	}
   }else{
     if(candidates == 0){
