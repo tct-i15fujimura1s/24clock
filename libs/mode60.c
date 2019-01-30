@@ -3,6 +3,7 @@
 #include "mode60.h"
 
 char mode60_title[] = HK_O HK_SE HK_RO;
+int cnt[11];
 
 /*よく使うかもしれない文字列を定義*/
 #define S_ANATA HK_A HK_NA HK_TA
