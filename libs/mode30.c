@@ -144,7 +144,7 @@ void do_mode30(UI_DATA* ud){
     /* 他のモード遷移した時に実行 もしくは，1秒ごとに表示*/
     /*必要なら，何らかのモードの初期化処理*/
     lcd_clear();  //0123456789ABCDEF
-    lcd_putstr(4,0,HK_MI HK_TI HK_WO HK_MI HK_TU HK_TE HK_NE); /*モード2の初期表示*/
+    lcd_putstr(4,0,HK_MI HK_TI HK_WO HK_MI HK_TU HK_KE HK_TE HK_NE); /*モード2の初期表示*/
     //show_sec();
     sec_flag=FALSE;
   }
