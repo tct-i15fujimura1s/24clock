@@ -72,7 +72,7 @@ char *tithe_mode_titles[] = {
 
 #  ifdef MAIN_C
 UI_DATA* ui(char sw){ /* ミーリ型？ムーア型？どっちで実装？良く考えて */
-  static UI_DATA ui_data={MODE_0,MODE_0,};
+  static UI_DATA ui_data={MODE_0,MODE_OUT_OF_MIN,};
   int prev_mode;
 
   ui_data.sw=(sw & 0x9f); /*念のために，b6,b5を0にしておく*/
