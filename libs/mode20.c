@@ -33,7 +33,7 @@ lcd_putstr(4,1,"mintimer");
    if(i>=sizeof(time_data_arr)){
      i=0;
    }
-   if(j>=sizeof(timedata_arr)){
+   if(j>=sizeof(time_data_arr)){
      j=0;
    }
    break;
