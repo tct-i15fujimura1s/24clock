@@ -16,8 +16,6 @@ unsigned int matrix_led_pattern[8]=
 {0x7e7e,0x1111,0x1111,0x0011,0x007e,0x7f00,0x4900,0x4900};
 /*列0～7のデータ(詳細は，過去のリストを読め)*/
 
-#define DEBUG          /* デバッグ中は，定義しておく */
-
 /* int_timera() や int_imterv() の割込ルーチン(ボトムハーフの処理) */
 
 #pragma interrupt                   /*割込処理ルーチンであることの指定*/
