@@ -1,6 +1,8 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+//#define DEBUG          /* デバッグ中は，定義しておく */
+
 extern volatile int sec_flag;
 extern volatile int sec;
 extern volatile int tma_flag;
