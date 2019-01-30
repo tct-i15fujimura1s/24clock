@@ -48,6 +48,7 @@ static void refresh();
 static int put(enum TURN turn, POS p);
 static int flip(enum TURN turn, POS p, POS d);
 static void set(enum TURN turn, POS p);
+static unsigned int rand();
 
 static int cycle = 0;
 static void com_routine();
@@ -276,4 +277,11 @@ static void com_routine(){
   //TODO
   //nサイクルかけてゆっくり処理
   cycle++;
+}
+
+static unsigned int rand(){
+  static unsigned int a = 0x1234, b = 0x1111;
+  a = a * 17 + 91;
+  b = b * 13 + 29;
+  return (a & 0xff00) | ((b >> 8) & 0x00ff);
 }
