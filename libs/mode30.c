@@ -4,6 +4,7 @@
 char mode30_title[] = HK_ME HK_I HK_RO; /* メイロ */
 
 static unsigned int l=0,u=0,c=0,i; /* c:コース番号 */
+/* 赤 = 緑 << 8 */
 static unsigned int matrix_pattern[10][8]={
   {0x1800,0x3c00,0x7e00,0xdb00,0x9900,0x1800,0x1800,0x1800}, /* 緑 ← */
   {0x0018,0x003c,0x007e,0x00db,0x0099,0x0018,0x0018,0x0018}, /* 赤 ← */
