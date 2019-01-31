@@ -3,15 +3,34 @@
 
 char mode30_title[] = HK_ME HK_I HK_RO; /* メイロ */
 
+typedef enum {
+  LEFT,
+  RIGHT,
+  UP,
+  DOWN
+} DIRECTION;
+
+typedef enum {
+  RED = 1,
+  GREEN = 2,
+  ORANGE = 3
+} COLOR;
+
 static void copy(const unsigned char dest[8], unsigned char src[8]);
 static void transpose(unsigned char matrix[8]);
 static void invert_cols(unsigned char matrix[8]);
 static void matrix_led_clear();
 static void paint_red(const unsigned char matrix[8]);
 static void paint_green(const unsigned char matrix[8]);
+static inline void set_arrow_up(unsigned char matrix[8]);
+static inline void set_arrow_left(unsigned char matrix[8]);
+static inline void set_arrow_down(unsigned char matrix[8]);
+static inline void set_arrow_right(unsigned char matrix[8]);
+static void paint_arrow(DIRECTION dir, COLOR color);
 
 static unsigned int l=0,u=0,c=0,i; /* c:コース番号 */
-static unsigned char arrow_pattern[8] = {0x18,0x0c,0x06,0xff,0xff,0x06,0x0c,0x18}; /* ↑ */
+static unsigned char arrow_pattern[8] = {0x18,0x3c,0x7e,0xdb,0x99,0x18,0x18,0x18}; /* ← */
+static unsigned char rect_pattern[8] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff}; /* ■ */
 static unsigned int matrix_pattern[10][8]={
   {0x1800,0x3c00,0x7e00,0xdb00,0x9900,0x1800,0x1800,0x1800}, /* 緑 ← */
   {0x0018,0x003c,0x007e,0x00db,0x0099,0x0018,0x0018,0x0018}, /* 赤 ← */
@@ -24,6 +43,7 @@ static unsigned int matrix_pattern[10][8]={
   {0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff}, /* オレンジ ■ */
   {0xff00,0xff00,0xff00,0xff00,0xff00,0xff00,0xff00,0xff00}}; /* 緑 ■ */
 void do_mode30(UI_DATA* ud){
+  unsigned char matrix[8];
   switch(ud->sw){  /*モード内でのキー入力別操作*/
   case KEY_LONG_C:  /* 中央キーの長押し */
     ud->mode=MODE_0; /* 次は，モード0に戻る */
@@ -32,119 +52,117 @@ void do_mode30(UI_DATA* ud){
     if(c==0){
       //コース1
       if(l<=1 && u==2){
-	l++;
-	for(i=0;i<8;i++)
-	  matrix_led_pattern[i]=matrix_pattern[0][i];
+        l++;
+        paint_arrow(LEFT, GREEN);
       }else{
-	for(i=0;i<8;i++)
-	  matrix_led_pattern[i]=matrix_pattern[1][i];
+        paint_arrow(LEFT, RED);
       }
     }else{
       //コース2
       if((l==1 && (u==0 || u==3)) || (l==2 && (u==1 || u==3))){
-	//進めた時
-	l--;
-	//スタート位置判定
-	if(u==0 && l==0){
-	  for(i=0;i<8;i++)
-	    matrix_led_pattern[i]=matrix_pattern[8][i];
-	}else{
-	  for(i=0;i<8;i++)
-	    matrix_led_pattern[i]=matrix_pattern[0][i];
-	}
+        //進めた時
+        l--;
+        //スタート位置判定
+        if(u==0 && l==0){
+          copy(matrix, rect_pattern);
+          matrix_led_clear();
+          paint_red(matrix);
+          paint_green(matrix);
+        }else{
+          paint_arrow(LEFT, GREEN);
+        }
       }else{
-	for(i=0;i<8;i++)
-	  matrix_led_pattern[i]=matrix_pattern[1][i];
+        paint_arrow(LEFT, RED);
       }
     }
     break;
   case KEY_SHORT_R:
     if(c==0){
       if(0<l && u==2){
-	l--;
-	for(i=0;i<8;i++)
-	  matrix_led_pattern[i]=matrix_pattern[2][i];
+        l--;
+        for(i=0;i<8;i++)
+          matrix_led_pattern[i]=matrix_pattern[2][i];
       }else{
-	for(i=0;i<8;i++)
-	  matrix_led_pattern[i]=matrix_pattern[3][i];
+        for(i=0;i<8;i++)
+          matrix_led_pattern[i]=matrix_pattern[3][i];
       }
     }else{
-      if((l==0 && (u==0 || u==3)) || (l==1 && (u==1 || u==3))){	  
-	for(i=0;i<8;i++)
-	  matrix_led_pattern[i]=matrix_pattern[2][i];
-	l++;
+      if((l==0 && (u==0 || u==3)) || (l==1 && (u==1 || u==3))){          
+        for(i=0;i<8;i++)
+          matrix_led_pattern[i]=matrix_pattern[2][i];
+        l++;
       }else{
-	for(i=0;i<8;i++)
-	  matrix_led_pattern[i]=matrix_pattern[3][i];
+        for(i=0;i<8;i++)
+          matrix_led_pattern[i]=matrix_pattern[3][i];
       }
     }
     break;
   case KEY_SHORT_U:
     if(c==0){
       if(u<=1){
-	u++;
-	for(i=0;i<8;i++)
-	  matrix_led_pattern[i]=matrix_pattern[4][i];
+        u++;
+        for(i=0;i<8;i++)
+          matrix_led_pattern[i]=matrix_pattern[4][i];
       }else{
-	for(i=0;i<8;i++)
-	  matrix_led_pattern[i]=matrix_pattern[5][i];
+        for(i=0;i<8;i++)
+          matrix_led_pattern[i]=matrix_pattern[5][i];
       }
     }else{
       if((l==1 && u==1) || (l==2 && (u==2 || u==3))){
-	for(i=0;i<8;i++)
-	  matrix_led_pattern[i]=matrix_pattern[4][i];
-	u--;
+        for(i=0;i<8;i++)
+          matrix_led_pattern[i]=matrix_pattern[4][i];
+        u--;
       }else{
-	for(i=0;i<8;i++)
-	  matrix_led_pattern[i]=matrix_pattern[5][i];
+        for(i=0;i<8;i++)
+          matrix_led_pattern[i]=matrix_pattern[5][i];
       }
     }
     break;
   case KEY_SHORT_D:
     if(c==0){
       if(0<u && l!=1){
-	u--;
-	if(u==0){
-	  if(l==2){
-	    for(i=0;i<8;i++)
-	      matrix_led_pattern[i]=matrix_pattern[9][i];
-	  }
-	  if(l==0){
-	    for(i=0;i<8;i++)
-	      matrix_led_pattern[i]=matrix_pattern[8][i];
-	  }
-	}else{
-	  for(i=0;i<8;i++)
-	    matrix_led_pattern[i]=matrix_pattern[6][i];
-	}
+        u--;
+        if(u==0){
+          if(l==2){
+            for(i=0;i<8;i++)
+              matrix_led_pattern[i]=matrix_pattern[9][i];
+          }
+          if(l==0){
+            for(i=0;i<8;i++)
+              matrix_led_pattern[i]=matrix_pattern[8][i];
+          }
+        }else{
+          for(i=0;i<8;i++)
+            matrix_led_pattern[i]=matrix_pattern[6][i];
+        }
       }else{
-	for(i=0;i<8;i++)
-	  matrix_led_pattern[i]=matrix_pattern[7][i];
+        for(i=0;i<8;i++)
+          matrix_led_pattern[i]=matrix_pattern[7][i];
       }
     }else{
       if((l==2 && (u==1 || u==2)) || (l==1 && u==0) || (l==0 && u==3)){
-	u++;
-	if(u==4){
-	  for(i=0;i<8;i++)
-	    matrix_led_pattern[i]=matrix_pattern[9][i];
-	}else{
-	  for(i=0;i<8;i++)
-	    matrix_led_pattern[i]=matrix_pattern[6][i];
-	}
+        u++;
+        if(u==4){
+          for(i=0;i<8;i++)
+            matrix_led_pattern[i]=matrix_pattern[9][i];
+        }else{
+          for(i=0;i<8;i++)
+            matrix_led_pattern[i]=matrix_pattern[6][i];
+        }
       }else{
-	for(i=0;i<8;i++)
-	  matrix_led_pattern[i]=matrix_pattern[7][i];
+        for(i=0;i<8;i++)
+          matrix_led_pattern[i]=matrix_pattern[7][i];
       }
       break;
       case KEY_SHORT_C:
-	for(i=0;i<8;i++)
-	  matrix_led_pattern[i]=matrix_pattern[8][i];
-	if(c==0)
-	  c=1;
-	else c=0;
-	l=0;
-	u=0;
-	break;
+        for(i=0;i<8;i++)
+          matrix_led_pattern[i]=matrix_pattern[8][i];
+        if(c==0)
+          c=1;
+        else c=0;
+        l=0;
+        u=0;
+        break;
     }
   }
   if(ud->prev_mode!=ud->mode || sec_flag==TRUE){ 
@@ -171,7 +189,13 @@ static void copy(const unsigned char dest[8], unsigned char src[8]){
 }
 
 static void transpose(unsigned char matrix[8]){
-  //TODO
+  int x, y;
+  int bit;
+  for(x = 0; x < 8; x++) for(y = 0; y < 8; y++) {
+    bit = (matrix[x] >> y) & 1;
+    matrix[x] = (matrix[x] & ~(1 << y)) | (((matrix[y] >> x) & 1) << y);
+    matrix[y] = (matrix[x] & ~(1 << x)) | (bit << x);
+  }
 }
 
 static void invert_cols(unsigned char matrix[8]){
@@ -197,4 +221,37 @@ static void paint_red(const unsigned char matrix[8]){
 static void paint_green(const unsigned char matrix[8]){
   int i;
   for(i = 0; i < 8; i++) matrix_led_pattern[i] |= ((int) matrix[i]) << 8;
+}
+
+
+static inline void set_arrow_up(unsigned char matrix[8]){
+  copy(matrix, arrow_pattern);
+  transpose(matrix);
+}
+
+static inline void set_arrow_left(unsigned char matrix[8]){
+  copy(matrix, arrow_pattern);
+}
+
+static inline void set_arrow_down(unsigned char matrix[8]){
+  copy(matrix, arrow_pattern);
+  invert_cols(matrix);
+  transpose(matrix);
+}
+static inline void set_arrow_right(unsigned char matrix[8]){
+  copy(matrix, arrow_pattern);
+  invert_cols(matrix);
+}
+
+static void paint_arrow(DIRECTION dir, COLOR color){
+  unsigned char matrix[8];
+  switch(dir){
+    case LEFT: set_arrow_left(matrix); break;
+    case RIGHT: set_arrow_right(matrix); break;
+    case UP: set_arrow_up(matrix); break;
+    case DOWN: set_arrow_down(matrix); break;
+  }
+  matrix_led_clear();
+  if(color & RED) paint_red(matrix);
+  if(color & GREEN) paint_green(matrix);
 }
