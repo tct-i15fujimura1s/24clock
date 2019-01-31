@@ -3,8 +3,15 @@
 
 char mode30_title[] = HK_ME HK_I HK_RO; /* メイロ */
 
+static void copy(const unsigned char dest[8], unsigned char src[8]);
+static void transpose(unsigned char matrix[8]);
+static void invert_cols(unsigned char matrix[8]);
+static void matrix_led_clear();
+static void paint_red(const unsigned char matrix[8]);
+static void paint_green(const unsigned char matrix[8]);
+
 static unsigned int l=0,u=0,c=0,i; /* c:コース番号 */
-/* 赤 = 緑 << 8 */
+static unsigned char arrow_pattern[8] = {0x18,0x0c,0x06,0xff,0xff,0x06,0x0c,0x18}; /* ↑ */
 static unsigned int matrix_pattern[10][8]={
   {0x1800,0x3c00,0x7e00,0xdb00,0x9900,0x1800,0x1800,0x1800}, /* 緑 ← */
   {0x0018,0x003c,0x007e,0x00db,0x0099,0x0018,0x0018,0x0018}, /* 赤 ← */
@@ -155,4 +162,39 @@ void do_mode30(UI_DATA* ud){
     ud->mode=MODE_0; /* 次は，モード0に戻る */
     break;
   }
+}
+
+
+static void copy(const unsigned char dest[8], unsigned char src[8]){
+  int i;
+  for(i = 0; i < 8; i++) dest[i] = src[i];
+}
+
+static void transpose(unsigned char matrix[8]){
+  //TODO
+}
+
+static void invert_cols(unsigned char matrix[8]){
+  int i;
+  char col;
+  for(i = 0; i < 4; i++){
+    col = matrix[i];
+    matrix[i] = matrix[7 - i];
+    matrix[7 - i] = col;
+  }
+}
+
+static void matrix_led_clear(){
+  int i;
+  for(i = 0; i < 8; i++) matrix_led_pattern[i] = 0x0000;
+}
+
+static void paint_red(const unsigned char matrix[8]){
+  int i;
+  for(i = 0; i < 8; i++) matrix_led_pattern[i] |= (int) matrix[i];
+}
+
+static void paint_green(const unsigned char matrix[8]){
+  int i;
+  for(i = 0; i < 8; i++) matrix_led_pattern[i] |= ((int) matrix[i]) << 8;
 }
