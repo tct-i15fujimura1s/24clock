@@ -16,15 +16,15 @@ typedef enum {
   ORANGE = 3
 } COLOR;
 
-static void copy(const unsigned char dest[8], unsigned char src[8]);
+static void copy(unsigned char dest[8], const unsigned char src[8]);
 static void transpose(unsigned char matrix[8]);
 static void invert_cols(unsigned char matrix[8]);
 static void matrix_led_clear();
 static void paint_red(const unsigned char matrix[8]);
 static void paint_green(const unsigned char matrix[8]);
-static void paint(const unsigned char pattern, DIR dir, COLOR color);
+static void paint(const unsigned char pattern[8], DIR dir, COLOR color);
 
-static unsigned int l=0,u=0,c=0,i; /* c:コース番号 */
+static unsigned int l=0,u=0,c=0; /* c:コース番号 */
 static unsigned char arrow_pattern[8] = {0x18,0x3c,0x7e,0xdb,0x99,0x18,0x18,0x18}; /* ← */
 static unsigned char rect_pattern[8] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff}; /* ■ */
 //static unsigned int matrix_pattern[10][8]={
@@ -39,7 +39,6 @@ static unsigned char rect_pattern[8] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff}
 //  {0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff}, /* オレンジ ■ */
 //  {0xff00,0xff00,0xff00,0xff00,0xff00,0xff00,0xff00,0xff00}}; /* 緑 ■ */
 void do_mode30(UI_DATA* ud){
-  unsigned char matrix[8];
   switch(ud->sw){  /*モード内でのキー入力別操作*/
   case KEY_LONG_C:  /* 中央キーの長押し */
     ud->mode=MODE_0; /* 次は，モード0に戻る */
@@ -160,7 +159,7 @@ void do_mode30(UI_DATA* ud){
 }
 
 
-static void copy(const unsigned char dest[8], unsigned char src[8]){
+static void copy(unsigned char dest[8], const unsigned char src[8]){
   int i;
   for(i = 0; i < 8; i++) dest[i] = src[i];
 }
@@ -200,7 +199,7 @@ static void paint_green(const unsigned char matrix[8]){
   for(i = 0; i < 8; i++) matrix_led_pattern[i] |= ((int) matrix[i]) << 8;
 }
 
-static void paint(const unsigned char pattern, DIR dir, COLOR color){
+static void paint(const unsigned char pattern[8], DIR dir, COLOR color){
   unsigned char matrix[8];
   copy(matrix, pattern);
   if(dir & RIGHT)
